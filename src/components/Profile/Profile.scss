@@ -1,0 +1,23 @@
+.block-profile {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px;
+    width: 100%;
+    font-family: 'Ubuntu';
+
+    img {
+        height: 40px;
+    }
+
+    .pin{
+        background-color: rgb(107, 107, 243);
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 14pt;
+        font-weight: bold;
+    }
+
+    background-color: rgb(61, 61, 61);
+    border-top-left-radius: 3px;
+}

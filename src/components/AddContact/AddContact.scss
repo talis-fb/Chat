@@ -1,0 +1,38 @@
+.space-for-button{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    position: relative;
+    button {
+        border: 0;
+        background-color: rgb(107, 107, 243);
+        font-family: 'Roboto';
+        font-weight: bolder;
+        border-radius: 10px;
+        height: 90%;
+        width: 90%;
+    }
+
+    .space-pin{
+        position: absolute;
+        top: -100%;
+        width: 80%;
+
+        div{
+            background-color: #282D33;
+            height: 30px;
+            width: 80%;
+            border-radius: 10px;
+            input{
+                font-family: 'Ubuntu';
+            }
+        }
+
+        .enable{
+            display: block;
+        }
+        .disable{
+            display: none;
+        }
+    }
+}
