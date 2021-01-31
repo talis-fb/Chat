@@ -1,6 +1,5 @@
 import React from 'react'
 import './AddContact.scss'
-import icon from '../assets/icon-profile.png'
 
 class AddContact extends React.Component {
     constructor(props){
@@ -22,7 +21,7 @@ class AddContact extends React.Component {
         return(
             <div className="space-for-button">
                 <button className="add-contact" onClick={()=>this.change()}>
-                    + Add Contact
+                      Add Contact
                 </button>
 
                 <div className='space-pin' style={ {display: this.state.displayAddContact} }>

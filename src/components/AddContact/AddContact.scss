@@ -5,26 +5,62 @@
     position: relative;
     button {
         border: 0;
+        outline: none;
         background-color: rgb(107, 107, 243);
-        font-family: 'Roboto';
+        font-family: 'Ubuntu';
         font-weight: bolder;
+        font-size: large;
+        text-align: center;
         border-radius: 10px;
+        
+        border-bottom: solid 3.5px rgb(68, 68, 121);
+        
         height: 90%;
         width: 90%;
+
+        &:hover {
+            transition: 0.1s;
+            background-color: rgb(137, 137, 247);
+            border-bottom: solid 3.5px rgb(79, 79, 122);
+        }
+
+        &:active {
+            border-bottom: none;
+        }
     }
 
     .space-pin{
         position: absolute;
-        top: -100%;
-        width: 80%;
-
+        top: -120%;
+        width: 100%;
+        
         div{
-            background-color: #282D33;
+            background-color: rgb(61, 61, 61);
+            padding: 20px;
             height: 30px;
             width: 80%;
             border-radius: 10px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Ubuntu';
             input{
                 font-family: 'Ubuntu';
+                width: 30%;
+                background: none;
+                outline: none;
+            }
+            &:after {
+                content: "";
+                background-color: rgb(61, 61, 61);
+                position: absolute;
+                height: 10px;
+                width: 10px;
+    
+                top: 100%;
+                transform: rotate(45deg);
+                margin-top: -5px;
             }
         }
 
