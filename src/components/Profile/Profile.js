@@ -1,6 +1,6 @@
 import React from 'react'
 import './Profile.scss'
-import icon from '../assets/icon-profile.png'
+import icon from '../../assets/icon-profile.png'
 
 export default function(props){
     return (
