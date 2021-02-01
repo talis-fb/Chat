@@ -1,0 +1,21 @@
+.box-text{
+
+    display: grid;
+    padding: 5px;
+
+    grid-template-columns: auto 50px;
+
+    background-color: grey;
+
+    .text {
+        background-color: rgb(90, 88, 88);
+        font-family: 'Ubuntu';
+        outline: 0;
+        border-radius: 10px;
+    }
+
+    svg{
+        width: 70%;
+        height: 70%;
+    }
+}
