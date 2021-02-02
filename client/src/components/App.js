@@ -15,11 +15,8 @@ class App extends React.Component {
     super(props)
 
     this.state = {
-      contacts: [
-        {name: "Arnaldo", msg: "Hello World!"},
-        {name: "Francisgleidson", msg: "AAAA"}
-      ],
-      messages: {
+      conversationToShow: 0,
+      contacts: {
         Arnaldo: {
           msgs: [
             {sender: 1, text: "Hey caba safado!", type: 1},
@@ -27,13 +24,32 @@ class App extends React.Component {
             {sender: 1, text: "Como estais??", type: 1},
             {sender: 2, text: "Doidazo", type: 1}
           ]
+        },
+        Franscisgleidson: {
+          msgs: [
+            {sender: 1, text: "Buenos Dias meu caro", type: 1},
+            {sender: 1, text: "como encontravos nesse presente dia?", type: 1},
+            {sender: 2, text: "Muy bien, obg por perguntar", type: 1},
+            {sender: 1, text: "Melhorou do coronga?", type: 1}
+          ]
         }
       }
     }
+
+    this.clickedOnContact = this.clickedOnContact.bind(this)
   }
+
+  clickedOnContact(name_of_contact){
+    this.setState({ conversationToShow: name_of_contact })
+  }
+  
 
 
   render(){
+    //simplification of states for don't type "this.state" every time
+    const contacts = Object.keys(this.state.contacts) 
+    const conversationToShow = this.state.conversationToShow 
+
     return (
       <div className="App">
         <div className="title">
@@ -45,8 +61,8 @@ class App extends React.Component {
             <Profile />
             <div className="contacts">
               { 
-                this.state.contacts.length > 0 
-                ? this.state.contacts.map( contact => <BlockOfChat name={contact.name} msg={contact.msg} /> ) 
+                contacts.length > 0 
+                ? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.clickedOnContact} /> ) 
                 : <WithoutMessages />
               }
             </div>
@@ -54,8 +70,12 @@ class App extends React.Component {
           </nav>
 
           <div className="messages">
-            {/* <SpaceMessageEmpty /> */}
-            <Messages contact={this.state.messages.Arnaldo} /> 
+            {
+              conversationToShow
+              ? <Messages contact={this.state.contacts[conversationToShow]} /> 
+              : <SpaceMessageEmpty /> 
+            } 
+            
             <TextToSend />
           </div>
         </div>
