@@ -1,41 +1,72 @@
 const express = require('express')
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
 const path = require('path')
+const http = require('http').Server(app);
+const io = require('socket.io')(http); 
 
-app.use(express.static(path.resolve('./dist')))
-app.set('views', path.join(__dirname, 'dist'))
-// app.set('views', path.join(__dirname, 'views'));
-// app.engine('html', require('ejs').renderFile);
-// app.set('view engine', 'html');
-// app.use(express.static(path.join(__dirname, 'public/views')));
+app.use(express.static(path.join( __dirname, '..','dist')))
+console.log(path.join( __dirname, '..','dist'))
+app.set('views', path.join(__dirname,'..', 'dist'))
+
+const users = {
+    P0001:{
+        name: 'Chicão',
+        conversations: {
+            P1122: {
+                type: 1,
+                c: 'c7yjjk9'
+            }
+        }   
+    },
+    P1122:{
+        name: 'Cuscuz',
+        conversations: {
+            P0001: {
+                type: 2,
+                c: 'c7yjjk9'
+            }
+        }   
+    }
+    //Math.random().toString(36).substring(7);
+}
+
+const messages = {
+    c7yjjk9: [
+        {sender: 1, text: "Ei po, sabia q essa é a primeira conversa nesse canto?", type: 1},
+        {sender: 2, text: "Sabia n bicho! :o", type: 1},
+        {sender: 2, text: "Bizarro", type: 1},
+        {sender: 1, text: "Sabia q tmb nós dois somos a mesma pessoa", type: 1},
+        {sender: 2, text: ":0", type: 1}
+    ]
+}
 
 app.get('/', (req, res) => {
-    //res.sendFile( __dirname + '/dist' + '/index.html');
-    res.sendFile( __dirname + '/dist/index.html');
-    console.log(__dirname, '/index.html')
+    res.sendFile(path.join( __dirname, 'dist' , 'index.html'));
+    console.log(path.join( __dirname, 'dist' , 'index.html'))
 })
-  
-const messages = []
 
-/*
-io.on('connection', (socket) => {
-
+io.on('connection', socket => {
     console.log(`New user: ${socket.id}`)
-    
 
-    //Ação para quando RECEBER A MENSAGEM com o titulo 'chat message'
-    socket.on('chat message', (msg)=>{
-        console.log(`New msg: ${msg}`)
+    socket.on('addContact', (pin, pinOfSolicitor) => {
+        const codeOfConv = users['P'+pin].conversations['P'+pinOfSolicitor].c
+        const name = users['P'+pin].name
+        const msgs = messages[codeOfConv]
 
-        io.emit('chat message', msg) //ENVIA para o CLIENT a mesma mensagem
-        messages.push(msg)
+        conversation = {}
+        conversation[name] = {
+            msgs: msgs
+        }
+
+        socket.emit('newContact', conversation)
     })
 
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
+
 });
-*/
-app.listen(3000, () => console.log('Server on:3000'))
+
+http.listen(3000, () => {
+    console.log('listening on *:3000');
+  });

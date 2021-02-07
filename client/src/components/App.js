@@ -10,11 +10,27 @@ import TextToSend from './TextToSend/TextToSend'
 
 import './App.scss';
 
+import client from 'socket.io-client';
+var socket = client('http://localhost:3000/')
+
 class App extends React.Component {
   constructor(props){
     super(props)
 
+    socket.on('newContact', contact => {
+      this.setState({ 
+        contacts:{ 
+          ...this.state.contacts,
+          ...contact
+          }
+      })
+    })
+
     this.state = {
+      dadesOfUser:{
+        name: 'Text',
+        pin: 1122
+      },
       conversationToShow: 0,
       contacts: {
         Arnaldo: {
@@ -37,13 +53,18 @@ class App extends React.Component {
     }
 
     this.clickedOnContact = this.clickedOnContact.bind(this)
+    this.addContact = this.addContact.bind(this)
   }
 
   clickedOnContact(name_of_contact){
     this.setState({ conversationToShow: name_of_contact })
   }
-  
 
+  addContact(pinForAdd){
+    const owmPin = this.state.dadesOfUser.pin
+    console.log(owmPin)
+    socket.emit('addContact', pinForAdd, owmPin)
+  }
 
   render(){
     //simplification of states for don't type "this.state" every time
@@ -58,7 +79,7 @@ class App extends React.Component {
 
         <div className="chat">
           <nav className="list-of-contacts">
-            <Profile />
+            <Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
             <div className="contacts">
               { 
                 contacts.length > 0 
@@ -66,7 +87,7 @@ class App extends React.Component {
                 : <WithoutMessages />
               }
             </div>
-            <AddContact />
+            <AddContact addContact={this.addContact} />
           </nav>
 
           <div className="messages">
