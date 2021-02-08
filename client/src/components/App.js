@@ -62,7 +62,6 @@ class App extends React.Component {
 
   addContact(pinForAdd){
     const owmPin = this.state.dadesOfUser.pin
-    console.log(owmPin)
     socket.emit('addContact', pinForAdd, owmPin)
   }
 

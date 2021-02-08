@@ -9,14 +9,14 @@ import icon6 from '../../assets/united.svg'
 
 import './SpaceMessageEmpty.scss'
 
+const icons = [
+    icon1,icon2,icon3,
+    icon4,icon5,icon6
+]
+
+const iconRandom = icons[Math.floor(Math.random() * icons.length)];
+
 export default function(props){
-    const icons = [
-        icon1,icon2,icon3,
-        icon4,icon5,icon6
-    ]
-
-    var iconRandom = icons[Math.floor(Math.random() * icons.length)];
-
     return(
         <div className="space-msg-empty">
             <h1>Welcome to the Chat-uoTuVisse</h1>

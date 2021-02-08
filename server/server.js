@@ -26,6 +26,18 @@ const users = {
                 c: 'c7yjjk9'
             }
         }   
+    },
+    P2222: {
+        name: 'Alone',
+        conversations: {
+
+        }   
+    },
+    P3333: {
+        name: 'Zefa',
+        conversations: {
+
+        }   
     }
     //Math.random().toString(36).substring(7);
 }
@@ -49,15 +61,45 @@ io.on('connection', socket => {
     console.log(`New user: ${socket.id}`)
 
     socket.on('addContact', (pin, pinOfSolicitor) => {
-        const codeOfConv = users['P'+pin].conversations['P'+pinOfSolicitor].c
-        const name = users['P'+pin].name
-        const msgs = messages[codeOfConv]
+        const userRequested = (pin!=pinOfSolicitor) && users['P'+pin]
+        const conversationBefore = userRequested.conversations['P'+pinOfSolicitor]
+        let codeOfConv
 
-        conversation = {}
+        //If the Pin dont exist
+        if( !userRequested ) return
+
+        //CREATE a new Chat
+        if( !conversationBefore ){
+            //If dont exist a conversation between both users...
+            console.log('CRIA O TALK')
+
+            //Creation of code of the new conversation
+            codeOfConv = Math.random().toString(36).substring(9);
+
+            //SET the conversation on the memory
+            users['P'+pin].conversations['P'+pinOfSolicitor] = { 
+                type: 1, //The type is for define from who is the messages
+                c: codeOfConv
+            }
+            users['P'+pinOfSolicitor].conversations['P'+pin] = { 
+                type: 2,
+                c: codeOfConv
+            }
+
+            //SET of messages Database
+            messages[codeOfConv] = []
+        } else {
+            // If it already has a conversation in database
+            codeOfConv = conversationBefore.c
+        }
+
+        //SENDING BACK for the socket
+        const name = userRequested.name
+        const msgs = messages[codeOfConv]
+        const conversation = {}
         conversation[name] = {
             msgs: msgs
         }
-
         socket.emit('newContact', conversation)
     })
 

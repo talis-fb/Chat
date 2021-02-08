@@ -29,14 +29,16 @@ export default class Messages extends React.Component{
 
     render(){
         const messages = this.props.contact.msgs
-        const box_of_messages = messages.map( 
-            i => 
-                i.sender===1 //condition
-                ? this.messageFromUser(i.text ) 
-                : this.messageFromFriend(i.text )
+        
+        let box_of_messages = null
+        if( !!messages[0] ){
+            box_of_messages = messages.map( 
+                i => 
+                    i.sender===1 //condition
+                    ? this.messageFromUser(i.text ) 
+                    : this.messageFromFriend(i.text )
             )
-
-        console.log(box_of_messages)
+        }
 
         return(
             <div className="messages-chat">
