@@ -1,0 +1,38 @@
+.WelcomeScreen {
+
+    height: 80vh;
+    width: 90vw;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .options-start{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        & > button{
+            width: 150px;
+            height: 5%;
+            margin-bottom: 10px;
+        }
+    }
+    .forms {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        & > input{
+            width: 95%;
+            height: 5%;
+            margin-bottom: 10px;
+        }
+        .form-new-user{
+
+        }
+        .form-log-in{
+
+        }
+    }
+
+}

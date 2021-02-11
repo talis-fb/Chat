@@ -1,0 +1,54 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu';
+}
+
+body {
+    background-color: #263238;
+}
+
+.App{
+
+    width: 95vw;
+    margin: 0 auto;
+
+    .title{
+        margin: 25px 0px;
+        font-size: large;
+        font-family: 'Unispace';
+    }
+    
+    .chat {
+        background-color: #f7f7f7;
+        width: 95%;
+        height: 80vh;
+        border-radius: 5px;
+        margin: 0 auto;
+
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+
+        .list-of-contacts{
+            // background-color: blue;
+            display: grid;
+            grid-template-rows: 50px auto 50px;
+            
+            background-color:#21242B;
+        }
+        .messages {
+            background-color: #282D33;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto 50px;
+            .space-msg-empty{
+                svg {
+                    width: 25%;
+                    height: auto;
+                }
+            }
+        }
+    }
+}

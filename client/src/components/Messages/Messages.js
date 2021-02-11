@@ -32,6 +32,7 @@ export default class Messages extends React.Component{
         
         let box_of_messages = null
         if( !!messages[0] ){
+            //If it has one messages, it'll create the divs
             box_of_messages = messages.map( 
                 i => 
                     i.sender===1 //condition
@@ -39,6 +40,8 @@ export default class Messages extends React.Component{
                     : this.messageFromFriend(i.text )
             )
         }
+
+        //If it doesn't received messages in props, the 'box_of_messages' keeps null
 
         return(
             <div className="messages-chat">
