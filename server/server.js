@@ -1,6 +1,7 @@
 const express = require('express')
-const app = express();
 const path = require('path')
+const bodyParser = require('body-parser')
+const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http); 
 
@@ -52,31 +53,80 @@ const messages = {
     ]
 }
 
+
+function findUser(User){
+	// find the PIN of a user based on its name
+	
+	const valuesDatabase = Object.values(users)
+	const indexOfUser = valuesDatabase.map( (obj, index) => {
+		if(obj.name == User){
+			return index
+		}
+	}).filter( i => i )
+
+	const pinsOfUsersInOrder = Object.keys(users)
+
+	return pinsOfUsersInOrder[indexOfUser]
+}
+
+
+
 app.get('/', (req, res) => {
     res.sendFile(path.join( __dirname, 'dist' , 'index.html'));
     console.log(path.join( __dirname, 'dist' , 'index.html'))
 })
 
+app.post('/register', async (req, res) => {
+	const { nickname, password } = req.body
+
+	try{
+		if(await findUser(nickname)) {
+			console.log('Nada')
+			return res.status(400).send({ error: "User already exist" })
+		}
+
+		// generate a new Pin random
+		const newPin = Math.random().toString(36).substring(9);
+
+		// insert in database 
+		users[newPin] = {
+			name: nickname,
+			conversation: {}
+		}
+
+		console.log(users)
+
+	} catch(err) {
+		console.log(err)
+	}
+
+})
+
 io.on('connection', socket => {
     console.log(`New user: ${socket.id}`)
+	
+	console.log(findUser('Alone'))
+	
+
 
     socket.on('addContact', (pin, pinOfSolicitor) => {
-        const userRequested = (pin!=pinOfSolicitor) && users['P'+pin]
-        const conversationBefore = userRequested.conversations['P'+pinOfSolicitor]
-        let codeOfConv
 
-        //If the Pin dont exist
+        const userRequested = (pin!=pinOfSolicitor) && users['P'+pin] // Return True if exist a user with the pin received AND the pin been diferent of pinOfSolicitor
+		
+        //If the Pin received dont exist
         if( !userRequested ) return
 
-        //CREATE a new Chat
+        const conversationBefore = userRequested.conversations['P'+pinOfSolicitor] // Return pin of conversation (if dont exist a user with will return undefined)
+        let codeOfConv // Who will receive the code of conversation for acess database and send of user
+
+        //CREATE a new Chat (If dont exist a conversation between both users...)
         if( !conversationBefore ){
-            //If dont exist a conversation between both users...
             console.log('CRIA O TALK')
 
-            //Creation of code of the new conversation
+            //Creation of code the new conversation
             codeOfConv = Math.random().toString(36).substring(9);
 
-            //SET the conversation on the memory
+            //SET the conversation on database of both users
             users['P'+pin].conversations['P'+pinOfSolicitor] = { 
                 type: 1, //The type is for define from who is the messages
                 c: codeOfConv
@@ -86,7 +136,7 @@ io.on('connection', socket => {
                 c: codeOfConv
             }
 
-            //SET of messages Database
+            //SET in Messages's Database
             messages[codeOfConv] = []
         } else {
             // If it already has a conversation in database

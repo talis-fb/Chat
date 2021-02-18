@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/talis-fb/Chat#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "react": "^17.0.1",

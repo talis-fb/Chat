@@ -17,15 +17,6 @@ class App extends React.Component {
   constructor(props){
     super(props)
 
-    socket.on('newContact', contact => {
-      this.setState({ 
-        contacts:{ 
-          ...this.state.contacts,
-          ...contact
-          }
-      })
-    })
-
     this.state = {
       dadesOfUser:{
         name: 'Text',
@@ -51,6 +42,16 @@ class App extends React.Component {
         }
       }
     }
+
+
+    socket.on('newContact', contact => {
+      this.setState({ 
+        contacts:{ 
+          ...this.state.contacts,
+          ...contact
+          }
+      })
+    })
 
     this.clickedOnContact = this.clickedOnContact.bind(this)
     this.addContact = this.addContact.bind(this)
