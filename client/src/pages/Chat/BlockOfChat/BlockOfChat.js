@@ -1,6 +1,6 @@
 import React from 'react'
 import './BlockOfChat.scss'
-import icon from '../../assets/icon-profile.png'
+import icon from '../../../assets/icon-profile.png'
 
 export default function(props){
     let lastMessage = props.msg[ props.msg.length - 1 ]

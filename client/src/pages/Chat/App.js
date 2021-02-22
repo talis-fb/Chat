@@ -8,7 +8,7 @@ import SpaceMessageEmpty from './SpaceMessageEmpty/SpaceMessageEmpty'
 import Messages from './Messages/Messages'
 import TextToSend from './TextToSend/TextToSend'
 
-import './Main.scss';
+import './App.scss';
 
 import client from 'socket.io-client';
 var socket = client('http://localhost:3000/')

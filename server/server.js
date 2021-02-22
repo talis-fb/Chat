@@ -5,6 +5,8 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http); 
 
+console.log(path.join( __dirname, '..','dist'))
+
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist'))
 app.set('views', path.join(__dirname,'..', 'dist'))
@@ -32,7 +34,8 @@ const users = {
         name: 'Alone',
         conversations: {
 
-        }   
+        },
+		password: 123
     },
     P3333: {
         name: 'Zefa',
@@ -79,8 +82,12 @@ app.get('/', (req, res) => {
 app.post('/register', async (req, res) => {
 	const { nickname, password } = req.body
 
+	console.log("REGISTER: DADOS RECEBIDOS")
+	console.log(nickname, password)
+
 	try{
 		if(await findUser(nickname)) {
+			//If user already exist
 			console.log('Nada')
 			return res.status(400).send({ error: "User already exist" })
 		}
@@ -96,10 +103,23 @@ app.post('/register', async (req, res) => {
 
 		console.log(users)
 
+		res.send({ registrado: 'sucesso'})
+
 	} catch(err) {
 		console.log(err)
+		return res.status(400).send({ error: err })
 	}
 
+})
+
+
+app.post('/login', async (req, res) => {
+	const { nickname, password } = req.body
+		
+	console.log("LOGIN: DADOS RECEBIDOS")
+	console.log(nickname, password)
+
+	res.send({ registrado: 'sucesso'})
 })
 
 io.on('connection', socket => {
