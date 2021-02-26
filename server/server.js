@@ -11,18 +11,24 @@ app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist'))
 app.set('views', path.join(__dirname,'..', 'dist'))
 
+//Configuration of Body-Parser
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+
 const users = {
     P0001:{
         name: 'Chicão',
+		password: 123,
         conversations: {
             P1122: {
                 type: 1,
                 c: 'c7yjjk9'
             }
-        }   
+        },
     },
     P1122:{
         name: 'Cuscuz',
+		password: 123,
         conversations: {
             P0001: {
                 type: 2,
@@ -32,13 +38,14 @@ const users = {
     },
     P2222: {
         name: 'Alone',
+		password: 123,
         conversations: {
 
         },
-		password: 123
     },
     P3333: {
         name: 'Zefa',
+		password: 123,
         conversations: {
 
         }   
@@ -75,20 +82,21 @@ function findUser(User){
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join( __dirname, 'dist' , 'index.html'));
-    console.log(path.join( __dirname, 'dist' , 'index.html'))
+    res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
+    console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
 })
 
 app.post('/register', async (req, res) => {
-	const { nickname, password } = req.body
-
-	console.log("REGISTER: DADOS RECEBIDOS")
-	console.log(nickname, password)
-
 	try{
-		if(await findUser(nickname)) {
+		const { nickname, password } = req.body
+
+		console.log(req.body)
+
+		console.log("REGISTER: DADOS RECEBIDOS")
+
+		if( await findUser(nickname) ) {
 			//If user already exist
-			console.log('Nada')
+			console.log('Nada, CABA JÁ REGISTRADO')
 			return res.status(400).send({ error: "User already exist" })
 		}
 
@@ -96,8 +104,9 @@ app.post('/register', async (req, res) => {
 		const newPin = Math.random().toString(36).substring(9);
 
 		// insert in database 
-		users[newPin] = {
+		users['P'+newPin] = {
 			name: nickname,
+			password: password,
 			conversation: {}
 		}
 
@@ -119,7 +128,7 @@ app.post('/login', async (req, res) => {
 	console.log("LOGIN: DADOS RECEBIDOS")
 	console.log(nickname, password)
 
-	res.send({ registrado: 'sucesso'})
+	res.send({ logado: 'NÃO IMPLEMENTADO'})
 })
 
 io.on('connection', socket => {

@@ -9,6 +9,11 @@ export default class WelcomeScreen extends React.Component{
         super(props)
 
         this.state = {
+			form: {
+				nickname: null,
+				password: null,
+				passwordConfirm: null
+			},
             option: null,
 			redirect: null // <Redirect to="/chat" />
             /* 
@@ -17,17 +22,28 @@ export default class WelcomeScreen extends React.Component{
              * 2 - LOG IN
              */
         }
+
+		this.handleInputChange = this.handleInputChange.bind(this)
     }
 
-	requestFromServer(nickname, password){
-		// this.setState({ redirect: (<Redirect to="/chat" />) })
+	requestFromServer(event){
 
+		event.preventDefault()
+
+		// this.setState({ redirect: (<Redirect to="/chat" />) })
+		let nickname = this.state.form.nickname
+		let password = this.state.form.password
+		let passwordConfirm = this.state.form.passwordConfirm
 		let url
 
-		if(option==1){
+		if(this.state.option==1){
 			// REGISTER 
+			if(passwordConfirm !== password){
+				//SENHAS DIFERENTES NOS DOIS CAMPOS
+				return
+			}
 			url = 'http://localhost:3000/register'
-		} else if(option==2) {
+		} else if(this.state.option==2) {
 			// LOGIN 
 			url = 'http://localhost:3000/login'
 		} else {
@@ -35,21 +51,19 @@ export default class WelcomeScreen extends React.Component{
 			return
 		}
 
-		console.log(url)
-
 		fetch( url,  {
-			headers: {'Content-Type': 'application/json'},
 			method: "POST", 
+			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({ 
 				nickname: nickname,
 				password: password
 			})  
 		})
-		.then( res => res.json() )
+		.then( res => res.json() ) // Transforma a resposta de json para obj
 		.then( res => {
 			// muda pra /chat
-			console.log('aaaaaaaaaaa')
-			// this.setState({ redirect: (<Redirect to="/chat" />) })
+			console.log(res)
+			//this.setState({ redirect: (<Redirect to="/chat" />) })
 		})
 		.catch( err => console.log(err))
 	}
@@ -58,22 +72,34 @@ export default class WelcomeScreen extends React.Component{
         this.setState({ option: op })
     }
 
+ 	handleInputChange(event) {
+		const target = event.target;
+        var value = target.value;
+        const name = target.name;
+
+	 	this.setState({ 
+			form: { ...this.state.form, [name]: value }
+		})
+	 }
+
+
     returnOption(){
         switch(this.state.option){
             case 1: // Register
                 return (
                     <React.Fragment>
-                        <input type="text" placeholder="Nome Usuario"></input>
-                        <input type="text" placeholder="Senha"></input>
-                        <input type="text" placeholder="Repita a senha"></input>
-						<button onClick={() => this.requestFromServer('Alone', 124)}>Chat</button>
+                        <input type="text" name="nickname" onChange={this.handleInputChange} className="name-reg" 	   placeholder="Nome Usuario"></input>
+                        <input type="text" name="password" onChange={this.handleInputChange} className="password-reg1" placeholder="Senha"></input>
+                        <input type="text" name="passwordConfirm" onChange={this.handleInputChange} className="password-reg2" placeholder="Repita a senha"></input>
+						<button onClick={(event) => this.requestFromServer(event)}>Chat</button>
                     </React.Fragment>
                 )
             case 2: // Log In
                 return (
                     <React.Fragment>
-						<input type="text" placeholder="Nome"></input>
-                        <input type="text" placeholder="Senha"></input>
+						<input type="text" name="nickname" onChange={this.handleInputChange} className="name-log" 	  placeholder="Nome"></input>
+                        <input type="text" name="password" onChange={this.handleInputChange} className="password-log" placeholder="Senha"></input>
+						<button onClick={(event) => this.requestFromServer(event)}>Chat</button>
                     </React.Fragment>
                 )
             default: // Without click
@@ -90,7 +116,7 @@ export default class WelcomeScreen extends React.Component{
 					<button onClick={() => this.changeOption(1) } >New User</button>
                     <button onClick={() => this.changeOption(2) } >Log In</button>
                 </section>
-                <form className="forms">
+				<form className="forms" >
                     {this.returnOption()}
 
 					{/*Component that make redirect if the user make login
