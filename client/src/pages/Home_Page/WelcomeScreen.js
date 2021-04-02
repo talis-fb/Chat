@@ -30,24 +30,27 @@ export default class WelcomeScreen extends React.Component{
 
 		event.preventDefault()
 
+		// Get the dades on forms
 		// this.setState({ redirect: (<Redirect to="/chat" />) })
 		let nickname = this.state.form.nickname
 		let password = this.state.form.password
 		let passwordConfirm = this.state.form.passwordConfirm
+
 		let url
 
 		if(this.state.option==1){
 			// REGISTER 
-			if(passwordConfirm !== password){
-				//SENHAS DIFERENTES NOS DOIS CAMPOS
-				return
-			}
 			url = 'http://localhost:3000/register'
 		} else if(this.state.option==2) {
 			// LOGIN 
 			url = 'http://localhost:3000/login'
 		} else {
 			console.log('OUTRO STATE COMO OPTION')
+			return
+		}
+			
+		// both passoword space aren't equals
+		if(passwordConfirm !== password){
 			return
 		}
 
