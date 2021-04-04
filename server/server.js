@@ -1,11 +1,18 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http); 
+const app = express()
+const http = require('http').Server(app)
+const io = require('socket.io')(http) 
+const mongoose = require('mongoose')
 
-console.log(path.join( __dirname, '..','dist'))
+// Models
+const MessagesDB = require('./models/Messages')
+const UsersDB = require('./models/Users')
+
+mongoose.connect('mongodb://localhost:27017/chat', { useNewUrlParser: "true" })
+	.then( () => console.log('MONGODB conectado'))
+	.catch( (err) => console.log('ERRO: '+err) )
 
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist'))
@@ -65,24 +72,6 @@ const database = {
 	}
 }
 
-function findUser(User){
-	// find the PIN of a user using his name for search it
-	
-	const valuesDatabase = Object.values(database.users)
-	const indexOfUser = valuesDatabase.map( (obj, index) => {
-		if(obj.name == User){
-			return index
-		}
-	})
-	.filter( i => i ) // remove the elements with 'undefined'
-
-	const pinsOfUsersInOrder = Object.keys(database.users)
-
-	return pinsOfUsersInOrder[indexOfUser]
-}
-
-
-
 app.get('/', (req, res) => {
     res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
     console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
@@ -97,7 +86,8 @@ app.post('/register', async (req, res) => {
 		console.log("REGISTER: DADOS RECEBIDOS")
 
 		//If user already exist --> return error and finish function
-		if( await findUser(nickname) ) {
+		const findUser = await UsersDB.findOne({ name: nickname})
+		if( findUser ) {
 			console.log('Nada, CABA JÁ REGISTRADO')
 			return res.status(400).send({ error: "User already exist" })
 		}
@@ -108,13 +98,17 @@ app.post('/register', async (req, res) => {
 		const newPin = Math.random().toString(36).substring(9);
 
 		// Insert in database 
-		database.users['P'+newPin] = {
+		const newUser = new UsersDB({
+			pin: newPin,
 			name: nickname,
 			password: password,
 			conversation: {}
-		}
+		})
 
-		console.log(database.users)
+		const data = await newUser.save()
+
+		console.log(data)
+
 		res.send({
 			registro: true,
 			name: nickname,
@@ -136,25 +130,22 @@ app.post('/login', async (req, res) => {
 		console.log("LOGIN: DADOS RECEBIDOS")
 		console.log(nickname, password)
 
-		// Get the pin of User logging
-		const pinOfUserLogging = await findUser(nickname)
-		console.log(pinOfUserLogging)
+		// Get the User logging
+		const UserLogging = await UsersDB.findOne({ name: nickname })
 
 		// If the user dont exist
-		if ( !pinOfUserLogging ){
-			res.send({ error: "User did not find" })
+		if ( !UserLogging ){
+			console.log("LOGIN: CABA NÃO ENCONTRADO")
+			return res.send({ error: "User did not find" })
 		}
 		
-		const userFound = database.users[pinOfUserLogging]
+		console.log(UserLogging)
 
 		const dadesToSendBack = {
-			name: userFound.name,
-			conversations: Object.keys(userFound.conversations)
-			
+			name: UserLogging.name
 		}
 
-		console.log('LOGADO:')
-		console.log(dadesToSendBack)
+		console.log('LOGADO: '+ UserLogging.name)
 
 		res.send( dadesToSendBack )
 	} catch (err) {
@@ -167,7 +158,7 @@ app.post('/login', async (req, res) => {
 io.on('connection', socket => {
     console.log(`New user: ${socket.id}`)
 	
-	console.log(findUser('Alone'))
+	//console.log(findUser('Alone'))
 
     socket.on('addContact', (pin, pinOfSolicitor) => {
 

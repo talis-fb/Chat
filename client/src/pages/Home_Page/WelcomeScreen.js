@@ -50,7 +50,7 @@ export default class WelcomeScreen extends React.Component{
 		}
 			
 		// both passoword space aren't equals
-		if(passwordConfirm !== password){
+		if( (passwordConfirm !== password) && this.state.option==1 ){
 			return
 		}
 
