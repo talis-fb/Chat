@@ -66,7 +66,16 @@ export default class WelcomeScreen extends React.Component{
 		.then( res => {
 			// muda pra /chat
 			console.log(res)
-			//this.setState({ redirect: (<Redirect to="/chat" />) })
+			const token = res.token
+			const registro = res.registro
+
+			if (token) {
+				localStorage.setItem("token", token)
+				if (registro){
+					this.setState({ redirect: (<Redirect to="/chat" />) })
+				}
+			}
+
 		})
 		.catch( err => console.log(err))
 	}

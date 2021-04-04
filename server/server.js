@@ -6,6 +6,9 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http) 
 const mongoose = require('mongoose')
 
+const jwt = require('jsonwebtoken')
+const secret = require('crypto').randomBytes(64).toString('hex')
+
 // Models
 const MessagesDB = require('./models/Messages')
 const UsersDB = require('./models/Users')
@@ -22,54 +25,8 @@ app.set('views', path.join(__dirname,'..', 'dist'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-
-const database = {
-	users: {
-		P0001:{
-			name: 'Chicão',
-			password: '123',
-			conversations: {
-				P1122: {
-					type: 1,
-					c: 'c7yjjk9'
-				}
-			},
-		},
-		P1122:{
-			name: 'Cuscuz',
-			password: '123',
-			conversations: {
-				P0001: {
-					type: 2,
-					c: 'c7yjjk9'
-				}
-			}   
-		},
-		P2222: {
-			name: 'Alone',
-			password: '123',
-			conversations: {
-
-			},
-		},
-		P3333: {
-			name: 'Zefa',
-			password: '123',
-			conversations: {
-
-			}   
-		}
-		//Math.random().toString(36).substring(7);
-	},
-	messages: {
-		c7yjjk9: [
-			{sender: 1, text: "Ei po, sabia q essa é a primeira conversa nesse canto?", type: 1},
-			{sender: 2, text: "Sabia n bicho! :o", type: 1},
-			{sender: 2, text: "Bizarro", type: 1},
-			{sender: 1, text: "Sabia q tmb nós dois somos a mesma pessoa", type: 1},
-			{sender: 2, text: ":0", type: 1}
-		]
-	}
+function generateAccessToken(username) {
+  return jwt.sign(username, secret);
 }
 
 app.get('/', (req, res) => {
@@ -106,13 +63,16 @@ app.post('/register', async (req, res) => {
 		})
 
 		const data = await newUser.save()
-
 		console.log(data)
+
+		const token = await generateAccessToken({ name: nickname, conversations: {} })
+		console.log('TOKEN ENVIADOS:')
+		console.log(token)
+
 
 		res.send({
 			registro: true,
-			name: nickname,
-			conversations: {}
+			token: token
 		})
 
 	} catch(err) {
