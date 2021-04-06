@@ -7,6 +7,7 @@ import AddContact from './AddContact/AddContact'
 import SpaceMessageEmpty from './SpaceMessageEmpty/SpaceMessageEmpty'
 import Messages from './Messages/Messages'
 import TextToSend from './TextToSend/TextToSend'
+import Auth from './AuthService/AuthService'
 
 import './App.scss';
 
@@ -17,10 +18,12 @@ class App extends React.Component {
   constructor(props){
     super(props)
 
+	const user = Auth.getCurrentUser()
+
     this.state = {
       dadesOfUser:{
-        name: 'Text',
-        pin: 1122
+        name: user.name,
+        pin: user.pin
       },
       conversationToShow: 0,
       contacts: {
@@ -62,8 +65,7 @@ class App extends React.Component {
   }
 
   addContact(pinForAdd){
-    const owmPin = this.state.dadesOfUser.pin
-    socket.emit('addContact', pinForAdd, owmPin)
+  	socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
   }
 
   render(){

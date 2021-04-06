@@ -72,6 +72,10 @@ app.post('/register', async (req, res) => {
 
 		res.send({
 			registro: true,
+			user: {
+				name: nickname,
+				pin: newPin
+			},
 			token: token
 		})
 
@@ -81,7 +85,6 @@ app.post('/register', async (req, res) => {
 	}
 
 })
-
 
 app.post('/login', async (req, res) => {
 	try {
@@ -98,11 +101,18 @@ app.post('/login', async (req, res) => {
 			console.log("LOGIN: CABA NÃO ENCONTRADO")
 			return res.send({ error: "User did not find" })
 		}
-		
 		console.log(UserLogging)
 
+		if ( UserLogging.password !== password ){
+			console.log('Senha errada')
+			return res.send({ error: 'senha errada' })
+		}
+
 		const dadesToSendBack = {
-			name: UserLogging.name,
+			user: {
+				name: UserLogging.name,
+				pin: UserLogging.pin
+			},
 			token: generateAccessToken(UserLogging.name)
 		}
 
@@ -121,49 +131,50 @@ io.on('connection', socket => {
 	
 	//console.log(findUser('Alone'))
 
-    socket.on('addContact', async (pin, pinOfSolicitor) => {
+    socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 
-		const peopleInSearch = await UsersDB.findOne({ pin: pin })
+		console.log('pessoa quem add')
+		console.log(userRequesting)
 
-        const userRequested = (pin!=pinOfSolicitor) && peopleInSearch // Return True if exist a user with the pin received AND the pin been diferent of pinOfSolicitor
+		console.log('pessoa para add')
+		console.log(pinFromWhoAdd)
+		const peopleInSearch = await UsersDB.findOne({ pin: pinFromWhoAdd })
 		
-        //If the Pin received dont exist
-        if( !userRequested ) return
+        //If the Pin received is the same of who is requesting
+        if( pinFromWhoAdd===userRequesting.pin ) return
+		
+		// If already exist a conversation between both users
+		// .....falta implementar
 
-        const conversationBefore = userRequested.conversations // Return pin of conversation (if dont exist a user with will return undefined)
+		console.log('CRIA O TALK')
 
-		console.log('Conversas...')
-		console.log(conversationBefore)
+		//Creation of code the new conversation
+		const codeOfConv = Math.random().toString(36).substring(9);
 
-        let codeOfConv // Who will receive the code of conversation for acess database and send of user
-
-        //CREATE a new Chat (If dont exist a conversation between both users...)
-        if( !conversationBefore.length ){
-            console.log('CRIA O TALK')
-
-            //Creation of code the new conversation
-            codeOfConv = Math.random().toString(36).substring(9);
-
-            //SET the conversation on database of both users
-			const user1 = await UsersDB.updateOne( { pin:pin }, {
-				$push: { //Insert a new item in array conversations of user
-					conversations: {
-						contact: 'oi',
-						type: 1,
-						cod: codeOfConv
-					}	
-				}
-			})
-			user1.exec()
-
-            //SET in Messages's Database
-            //database.messages[codeOfConv] = []
-        } else {
-            // If it already has a conversation in database
-			console.log('JÁ TEM ESSA CONVERSA PARCEIRO')
-			return
-        }
-
+		//SET the conversation on database of both users
+		const user1 = await UsersDB.updateOne( { pin:pinFromWhoAdd }, {
+			$push: { //Insert a new item in array conversations of user
+				conversations: {
+					contact: userRequesting.name,
+					type: 2,
+					cod: codeOfConv
+				}	
+			}
+		})
+		const user2 = await UsersDB.updateOne( { pin:userRequesting.pin }, {
+			$push: { //Insert a new item in array conversations of user
+				conversations: {
+					contact: peopleInSearch.name,
+					type: 1,
+					cod: codeOfConv
+				}	
+			}
+		})
+		
+		//SAVE in Messages's Database
+		user1.exec()
+		user2.exec()
+		
         //SENDING BACK for the socket
         const name = userRequested.name
         const msgs = []
