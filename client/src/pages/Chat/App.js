@@ -15,96 +15,108 @@ import client from 'socket.io-client';
 var socket = client('http://localhost:3000/')
 
 class App extends React.Component {
-  constructor(props){
-    super(props)
+	constructor(props){
+		super(props)
 
-	const user = Auth.getCurrentUser()
+		const user = Auth.getCurrentUser()
 
-    this.state = {
-      dadesOfUser:{
-        name: user.name,
-        pin: user.pin
-      },
-      conversationToShow: 0,
-      contacts: {
-        Arnaldo: {
-          msgs: [
-            {sender: 1, text: "Hey caba safado!", type: 1},
-            {sender: 2, text: "Opa", type: 1},
-            {sender: 1, text: "Como estais??", type: 1},
-            {sender: 2, text: "Doidazo", type: 1}
-          ]
-        },
-        Franscisgleidson: {
-          msgs: [
-            {sender: 1, text: "Buenos Dias meu caro", type: 1},
-            {sender: 1, text: "como encontravos nesse presente dia?", type: 1},
-            {sender: 2, text: "Muy bien, obg por perguntar", type: 1},
-            {sender: 1, text: "Melhorou do coronga?", type: 1}
-          ]
-        }
-      }
-    }
+		this.state = {
+			dadesOfUser:{
+				name: user.name,
+				pin: user.pin
+			},
+			conversationToShow: 0,
+			contacts: {
+				Arnaldo: {
+					msgs: [
+						{sender: 1, text: "Hey caba safado!", type: 1},
+						{sender: 2, text: "Opa", type: 1},
+						{sender: 1, text: "Como estais??", type: 1},
+						{sender: 2, text: "Doidazo", type: 1}
+					]
+				},
+				Franscisgleidson: {
+					msgs: [
+						{sender: 1, text: "Buenos Dias meu caro", type: 1},
+						{sender: 1, text: "como encontravos nesse presente dia?", type: 1},
+						{sender: 2, text: "Muy bien, obg por perguntar", type: 1},
+						{sender: 1, text: "Melhorou do coronga?", type: 1}
+					]
+				}
+			}
+		}
 
 
-    socket.on('newContact', contact => {
-      this.setState({ 
-        contacts:{ 
-          ...this.state.contacts,
-          ...contact
-          }
-      })
-    })
+		socket.on('newContact', contact => {
+			console.log('CHEGOU O SINAL PARA ADD CONTACTS')
+			console.log(contact)
+			this.updateContactList(contact)
+		})
 
-    this.clickedOnContact = this.clickedOnContact.bind(this)
-    this.addContact = this.addContact.bind(this)
-  }
+		this.clickedOnContact = this.clickedOnContact.bind(this)
+		this.addContact = this.addContact.bind(this)
+	}
 
-  clickedOnContact(name_of_contact){
-    this.setState({ conversationToShow: name_of_contact })
-  }
+	updateContactList(newOne){
+		console.log('DARAAA')
+			this.setState({ 
+				contacts:{ 
+					...this.state.contacts,
+					...newOne
+				}
+			})
+	}
 
-  addContact(pinForAdd){
-  	socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
-  }
+	clickedOnContact(name_of_contact){
+		this.setState({ conversationToShow: name_of_contact })
+	}
 
-  render(){
-    //simplification of states for don't type "this.state" every time
-    const contacts = Object.keys(this.state.contacts) 
-    const conversationToShow = this.state.conversationToShow 
+	addContact(pinForAdd){
+		socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
+	}
 
-    return (
-      <div className="App">
-        <div className="title">
-          Chat-oTuVisse
-        </div>
+	logout(){
+		Auth.logout()
+	}
 
-        <div className="chat">
-          <nav className="list-of-contacts">
-            <Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
-            <div className="contacts">
-              { 
-                contacts.length > 0 
-                ? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.clickedOnContact} /> ) 
-                : <WithoutMessages />
-              }
-            </div>
-            <AddContact addContact={this.addContact} />
-          </nav>
+	render(){
+		//simplification of states for don't type "this.state" every time
+		const contacts = Object.keys(this.state.contacts) 
+		const conversationToShow = this.state.conversationToShow 
 
-          <div className="messages">
-            {
-              conversationToShow
-              ? <Messages contact={this.state.contacts[conversationToShow]} /> 
-              : <SpaceMessageEmpty /> 
-            } 
-            
-            <TextToSend />
-          </div>
-        </div>
-      </div>
-    );
-  }
+
+		return (
+			<div className="App">
+				<div className="title">
+					<a className="logout" href="/" onClick={this.logout}>Chat-oTuVisse</a>
+				</div>
+
+				<div className="chat">
+					<nav className="list-of-contacts">
+						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
+						<div className="contacts">
+							{ 
+								contacts.length > 0 
+								? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.clickedOnContact} /> ) 
+								: <WithoutMessages />
+							}
+						</div>
+						<AddContact addContact={this.addContact} />
+					</nav>
+
+					<div className="messages">
+						{
+							conversationToShow
+							? <Messages contact={this.state.contacts[conversationToShow]} /> 
+							: <SpaceMessageEmpty /> 
+						} 
+
+						<TextToSend />
+					</div>
+				</div>
+			</div>
+		);
+	}
 }
 
 export default App;

@@ -15,7 +15,7 @@ const UsersDB = require('./models/Users')
 
 mongoose.connect('mongodb://localhost:27017/chat', { useNewUrlParser: "true" })
 	.then( () => console.log('MONGODB conectado'))
-	.catch( (err) => console.log('ERRO: '+err) )
+	.catch( (err) => console.log('ERRO em conectar ao MONGO: '+err) )
 
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist'))
@@ -133,13 +133,20 @@ io.on('connection', socket => {
 
     socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 
-		console.log('pessoa quem add')
-		console.log(userRequesting)
+		const doc = await UsersDB.findOne({ pin: pinFromWhoAdd }, 'name conversations')
+		const peopleInSearch = doc.name
 
-		console.log('pessoa para add')
-		console.log(pinFromWhoAdd)
-		const peopleInSearch = await UsersDB.findOne({ pin: pinFromWhoAdd })
-		
+		const isThereTalkBefore = doc.conversations.filter( i => i.contact === userRequesting.name )
+		if ( isThereTalkBefore[0] ){
+			console.log('TEM CONVERSA JÁ MEU CHAPA')
+			return
+		}
+
+		console.log('pessoa quem add')
+		console.log(userRequesting.name)
+		console.log('PEssoa em busca')
+		console.log(peopleInSearch)
+
         //If the Pin received is the same of who is requesting
         if( pinFromWhoAdd===userRequesting.pin ) return
 		
@@ -164,7 +171,7 @@ io.on('connection', socket => {
 		const user2 = await UsersDB.updateOne( { pin:userRequesting.pin }, {
 			$push: { //Insert a new item in array conversations of user
 				conversations: {
-					contact: peopleInSearch.name,
+					contact: peopleInSearch,
 					type: 1,
 					cod: codeOfConv
 				}	
@@ -172,17 +179,19 @@ io.on('connection', socket => {
 		})
 		
 		//SAVE in Messages's Database
-		user1.exec()
-		user2.exec()
+		//user1.exec()
+		//user2.exec()
 		
         //SENDING BACK for the socket
-        const name = userRequested.name
+        const name = peopleInSearch
         const msgs = []
         const conversation = {}
         conversation[name] = {
             msgs: msgs
         }
-        socket.emit('newContact', conversation)
+		console.log('CONVERDA')
+		console.log(conversation)
+		socket.emit('newContact', conversation)//{ `${name}`: msgs: [] })
     })
 
     socket.on('disconnect', () => {

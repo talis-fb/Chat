@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 import Home from './pages/Home_Page/WelcomeScreen'
 import Chat from './pages/Chat/App'
+import Auth from './pages/Chat/AuthService/AuthService'
+
+const browserWithAuth = () => Auth.getCurrentUser() ? <Chat /> : <Home />
 
 export default function(){
 	return(
@@ -14,7 +17,7 @@ export default function(){
 				</Route>
 
 				<Route path="/" >
-					<Home />
+					{browserWithAuth()}
 				</Route>
 			</Switch>
         </Router>
