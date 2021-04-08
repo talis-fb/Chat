@@ -26,12 +26,12 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 function generateAccessToken(username) {
-  return jwt.sign(username, secret);
+	return jwt.sign(username, secret);
 }
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
-    console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
+	res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
+	console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
 })
 
 app.post('/register', async (req, res) => {
@@ -89,7 +89,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
 	try {
 		const { nickname, password } = req.body
-			
+
 		console.log("LOGIN: DADOS RECEBIDOS")
 		console.log(nickname, password)
 
@@ -99,7 +99,7 @@ app.post('/login', async (req, res) => {
 		// If the user dont exist
 		if ( !UserLogging ){
 			console.log("LOGIN: CABA NÃO ENCONTRADO")
-			return res.send({ error: "User did not find" })
+			return res.send({ error: "Usuario nao encontrado" })
 		}
 		console.log(UserLogging)
 
@@ -127,11 +127,11 @@ app.post('/login', async (req, res) => {
 })
 
 io.on('connection', socket => {
-    console.log(`New user: ${socket.id}`)
-	
+	console.log(`New user: ${socket.id}`)
+
 	//console.log(findUser('Alone'))
 
-    socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
+	socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 
 		const doc = await UsersDB.findOne({ pin: pinFromWhoAdd }, 'name conversations')
 		const peopleInSearch = doc.name
@@ -147,9 +147,9 @@ io.on('connection', socket => {
 		console.log('PEssoa em busca')
 		console.log(peopleInSearch)
 
-        //If the Pin received is the same of who is requesting
-        if( pinFromWhoAdd===userRequesting.pin ) return
-		
+		//If the Pin received is the same of who is requesting
+		if( pinFromWhoAdd===userRequesting.pin ) return
+
 		// If already exist a conversation between both users
 		// .....falta implementar
 
@@ -177,29 +177,29 @@ io.on('connection', socket => {
 				}	
 			}
 		})
-		
+
 		//SAVE in Messages's Database
 		//user1.exec()
 		//user2.exec()
-		
-        //SENDING BACK for the socket
-        const name = peopleInSearch
-        const msgs = []
-        const conversation = {}
-        conversation[name] = {
-            msgs: msgs
-        }
+
+		//SENDING BACK for the socket
+		const name = peopleInSearch
+		const msgs = []
+		const conversation = {}
+		conversation[name] = {
+			msgs: msgs
+		}
 		console.log('CONVERDA')
 		console.log(conversation)
 		socket.emit('newContact', conversation)//{ `${name}`: msgs: [] })
-    })
+	})
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
+	socket.on('disconnect', () => {
+		console.log('user disconnected');
+	});
 
 });
 
 http.listen(3000, () => {
-    console.log('listening on *:3000');
-  });
+	console.log('listening on *:3000');
+});

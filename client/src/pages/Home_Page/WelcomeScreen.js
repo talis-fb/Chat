@@ -1,8 +1,10 @@
 import React from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 
-import './WelcomeScreen.scss'
+import { Alert } from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
+import './WelcomeScreen.scss'
 
 export default class WelcomeScreen extends React.Component{
     constructor(props){
@@ -15,7 +17,8 @@ export default class WelcomeScreen extends React.Component{
 				passwordConfirm: null
 			},
             option: null,
-			redirect: null // <Redirect to="/chat" />
+			redirect: null, // <Redirect to="/chat" />
+			alert_error: null
             /* 
              * option...
              * 1 - NEW USER
@@ -51,6 +54,7 @@ export default class WelcomeScreen extends React.Component{
 			
 		// both passoword space aren't equals
 		if( (passwordConfirm !== password) && this.state.option==1 ){
+			this.setState({ alert_error: 'Senha inseridas diferentes' })
 			return
 		}
 
@@ -64,8 +68,11 @@ export default class WelcomeScreen extends React.Component{
 		})
 		.then( res => res.json() ) // Transforma a resposta de json para obj
 		.then( res => {
-			// muda pra /chat
-			console.log(res)
+			if( res.error ){
+				console.log('DEU ERRROO')
+				this.setState({ alert_error: res.error })
+				return
+			}
 
 			const token = res.token
 			const user = JSON.stringify(res.user)
@@ -81,7 +88,7 @@ export default class WelcomeScreen extends React.Component{
 	}
 
     changeOption(op){
-        this.setState({ option: op })
+		this.setState({ option: op, alert_error: '' })
     }
 
  	handleInputChange(event) {
@@ -103,6 +110,7 @@ export default class WelcomeScreen extends React.Component{
                         <input type="text" name="nickname" onChange={this.handleInputChange} className="name-reg" 	   placeholder="Nome Usuario"></input>
                         <input type="text" name="password" onChange={this.handleInputChange} className="password-reg1" placeholder="Senha"></input>
                         <input type="text" name="passwordConfirm" onChange={this.handleInputChange} className="password-reg2" placeholder="Repita a senha"></input>
+						{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
 						<button onClick={(event) => this.requestFromServer(event)}>Chat</button>
                     </React.Fragment>
                 )
@@ -111,6 +119,7 @@ export default class WelcomeScreen extends React.Component{
                     <React.Fragment>
 						<input type="text" name="nickname" onChange={this.handleInputChange} className="name-log" 	  placeholder="Nome"></input>
                         <input type="text" name="password" onChange={this.handleInputChange} className="password-log" placeholder="Senha"></input>
+						{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
 						<button onClick={(event) => this.requestFromServer(event)}>Chat</button>
                     </React.Fragment>
                 )
