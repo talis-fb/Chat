@@ -150,9 +150,6 @@ io.on('connection', socket => {
 		//If the Pin received is the same of who is requesting
 		if( pinFromWhoAdd===userRequesting.pin ) return
 
-		// If already exist a conversation between both users
-		// .....falta implementar
-
 		console.log('CRIA O TALK')
 
 		//Creation of code the new conversation
@@ -178,16 +175,10 @@ io.on('connection', socket => {
 			}
 		})
 
-		//SAVE in Messages's Database
-		//user1.exec()
-		//user2.exec()
-
 		//SENDING BACK for the socket
-		const name = peopleInSearch
-		const msgs = []
-		const conversation = {}
-		conversation[name] = {
-			msgs: msgs
+		const conversation = {
+			name: peopleInSearch,
+			msgs: []
 		}
 		console.log('CONVERDA')
 		console.log(conversation)

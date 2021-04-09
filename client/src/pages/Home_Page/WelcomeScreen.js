@@ -2,7 +2,7 @@ import React from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 
 import { Alert } from 'react-bootstrap'
-import 'bootstrap/dist/css/bootstrap.min.css';
+//import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './WelcomeScreen.scss'
 
@@ -16,9 +16,9 @@ export default class WelcomeScreen extends React.Component{
 				password: null,
 				passwordConfirm: null
 			},
-            option: null,
 			redirect: null, // <Redirect to="/chat" />
-			alert_error: null
+			alert_error: null,
+            option: null
             /* 
              * option...
              * 1 - NEW USER
@@ -88,7 +88,7 @@ export default class WelcomeScreen extends React.Component{
 	}
 
     changeOption(op){
-		this.setState({ option: op, alert_error: '' })
+		this.setState({ option: op, alert_error: null })
     }
 
  	handleInputChange(event) {

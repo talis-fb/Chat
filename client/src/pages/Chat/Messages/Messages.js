@@ -28,21 +28,18 @@ export default class Messages extends React.Component{
     }
 
     render(){
-        const messages = this.props.contact.msgs
+        const messages = this.props.msgs
         
         let box_of_messages = null
-        if( !!messages[0] ){
-            //If it has one messages, it'll create the divs
-            box_of_messages = messages.map( 
-                i => 
-                    i.sender===1 //condition
-                    ? this.messageFromUser(i.text ) 
-                    : this.messageFromFriend(i.text )
-            )
-        }
+
+		box_of_messages = messages.map( i => {
+			switch(i.sender){
+				case 1: return this.messageFromUser(i.text ) 
+				case 2:	return this.messageFromFriend(i.text )
+			}
+		})
 
         //If it doesn't received messages in props, the 'box_of_messages' keeps null
-
         return(
             <div className="messages-chat">
                 { box_of_messages}

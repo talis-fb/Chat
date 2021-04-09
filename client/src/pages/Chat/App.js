@@ -27,12 +27,11 @@ class App extends React.Component {
 			},
 			conversationToShow: 0,
 			contacts: {
-				Arnaldo: {
+				Welcome: {
 					msgs: [
 						{sender: 1, text: "Hey caba safado!", type: 1},
-						{sender: 2, text: "Opa", type: 1},
 						{sender: 1, text: "Como estais??", type: 1},
-						{sender: 2, text: "Doidazo", type: 1}
+						{sender: 1, text: "Bem-vindo a esse app porreta dms", type: 1}
 					]
 				},
 				Franscisgleidson: {
@@ -48,26 +47,23 @@ class App extends React.Component {
 
 
 		socket.on('newContact', contact => {
-			console.log('CHEGOU O SINAL PARA ADD CONTACTS')
-			console.log(contact)
 			this.updateContactList(contact)
 		})
 
-		this.clickedOnContact = this.clickedOnContact.bind(this)
+		this.openAConversation = this.openAConversation.bind(this)
 		this.addContact = this.addContact.bind(this)
 	}
 
 	updateContactList(newOne){
-		console.log('DARAAA')
-			this.setState({ 
-				contacts:{ 
-					...this.state.contacts,
-					...newOne
-				}
-			})
+		const newContact = { 
+			[newOne.name]: { 
+				msgs: newOne.msgs 
+			}
+		}
+		this.setState({ contacts: { ...this.state.contacts, ...newContact } })
 	}
 
-	clickedOnContact(name_of_contact){
+	openAConversation(name_of_contact){
 		this.setState({ conversationToShow: name_of_contact })
 	}
 
@@ -80,10 +76,9 @@ class App extends React.Component {
 	}
 
 	render(){
-		//simplification of states for don't type "this.state" every time
+		// every name of contacts
 		const contacts = Object.keys(this.state.contacts) 
 		const conversationToShow = this.state.conversationToShow 
-
 
 		return (
 			<div className="App">
@@ -97,7 +92,7 @@ class App extends React.Component {
 						<div className="contacts">
 							{ 
 								contacts.length > 0 
-								? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.clickedOnContact} /> ) 
+								? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
 								: <WithoutMessages />
 							}
 						</div>
@@ -107,7 +102,7 @@ class App extends React.Component {
 					<div className="messages">
 						{
 							conversationToShow
-							? <Messages contact={this.state.contacts[conversationToShow]} /> 
+							? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
 							: <SpaceMessageEmpty /> 
 						} 
 
