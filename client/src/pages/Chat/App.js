@@ -8,6 +8,7 @@ import SpaceMessageEmpty from './SpaceMessageEmpty/SpaceMessageEmpty'
 import Messages from './Messages/Messages'
 import TextToSend from './TextToSend/TextToSend'
 import Auth from './AuthService/AuthService'
+import ErrorLog from './ErrorLog/ErrorLog'
 
 import './App.scss';
 
@@ -26,6 +27,7 @@ class App extends React.Component {
 				pin: user.pin
 			},
 			conversationToShow: 0,
+			errors: [],
 			contacts: {
 				Welcome: {
 					msgs: [
@@ -39,7 +41,7 @@ class App extends React.Component {
 						{sender: 1, text: "Buenos Dias meu caro", type: 1},
 						{sender: 1, text: "como encontravos nesse presente dia?", type: 1},
 						{sender: 2, text: "Muy bien, obg por perguntar", type: 1},
-						{sender: 1, text: "Melhorou do coronga?", type: 1}
+						{sender: 1, text: "Massa, agr temos algo nessa conversa de exemplo", type: 1}
 					]
 				}
 			}
@@ -47,6 +49,11 @@ class App extends React.Component {
 
 
 		socket.on('newContact', contact => {
+			if ( contact.error ){
+				const log = contact.error
+				this.showAnError(log)
+				return
+			}
 			this.updateContactList(contact)
 		})
 
@@ -54,10 +61,10 @@ class App extends React.Component {
 		this.addContact = this.addContact.bind(this)
 	}
 
-	updateContactList(newOne){
+	updateContactList(obj){
 		const newContact = { 
-			[newOne.name]: { 
-				msgs: newOne.msgs 
+			[obj.name]: { 
+				msgs: obj.msgs 
 			}
 		}
 		this.setState({ contacts: { ...this.state.contacts, ...newContact } })
@@ -69,6 +76,12 @@ class App extends React.Component {
 
 	addContact(pinForAdd){
 		socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
+	}
+
+	showAnError(textOfError){
+		const index = this.state.errors.length
+		this.setState({ errors: [...this.state.errors, textOfError] })
+		setTimeout( () => this.setState({  errors: this.state.errors.slice(index, 1)  }), 1000 )
 	}
 
 	logout(){
@@ -87,7 +100,7 @@ class App extends React.Component {
 				</div>
 
 				<div className="chat">
-					<nav className="list-of-contacts">
+					<nav className="space-of-contacts">
 						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
 						<div className="contacts">
 							{ 
@@ -96,7 +109,10 @@ class App extends React.Component {
 								: <WithoutMessages />
 							}
 						</div>
-						<AddContact addContact={this.addContact} />
+						<div className="options">
+							{this.state.errors.map( i => <ErrorLog text={i} />  )}
+							<AddContact  addContact={this.addContact} />
+						</div>
 					</nav>
 
 					<div className="messages">

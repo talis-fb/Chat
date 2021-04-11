@@ -134,11 +134,16 @@ io.on('connection', socket => {
 	socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 
 		const doc = await UsersDB.findOne({ pin: pinFromWhoAdd }, 'name conversations')
+		if( !doc ){
+			socket.emit('newContact', { error: 'contato não encontrado'})
+			return
+		}
 		const peopleInSearch = doc.name
 
 		const isThereTalkBefore = doc.conversations.filter( i => i.contact === userRequesting.name )
 		if ( isThereTalkBefore[0] ){
 			console.log('TEM CONVERSA JÁ MEU CHAPA')
+			socket.emit('newContact', { error: 'já adicionado'})
 			return
 		}
 
@@ -148,7 +153,10 @@ io.on('connection', socket => {
 		console.log(peopleInSearch)
 
 		//If the Pin received is the same of who is requesting
-		if( pinFromWhoAdd===userRequesting.pin ) return
+		if( pinFromWhoAdd===userRequesting.pin ) {
+			socket.emit('newContact', { error: 'PIN invalido'})
+			return
+		}
 
 		console.log('CRIA O TALK')
 

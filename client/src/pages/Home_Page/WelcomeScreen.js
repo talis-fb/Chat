@@ -30,11 +30,9 @@ export default class WelcomeScreen extends React.Component{
     }
 
 	requestFromServer(event){
-
 		event.preventDefault()
 
 		// Get the dades on forms
-		// this.setState({ redirect: (<Redirect to="/chat" />) })
 		let nickname = this.state.form.nickname
 		let password = this.state.form.password
 		let passwordConfirm = this.state.form.passwordConfirm
