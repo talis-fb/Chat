@@ -1,11 +1,11 @@
 import React from 'react'
 
-import icon1 from '../../../assets/binoculars.svg'
-import icon2 from '../../../assets/chat.svg'
-import icon3 from '../../../assets/comment.svg'
-import icon4 from '../../../assets/friends.svg'
-import icon5 from '../../../assets/question.svg'
-import icon6 from '../../../assets/united.svg'
+import icon1 from '../assets/binoculars.svg'
+import icon2 from '../assets/chat.svg'
+import icon3 from '../assets/comment.svg'
+import icon4 from '../assets/friends.svg'
+import icon5 from '../assets/question.svg'
+import icon6 from '../assets/united.svg'
 
 import './SpaceMessageEmpty.scss'
 

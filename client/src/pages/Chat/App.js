@@ -79,9 +79,19 @@ class App extends React.Component {
 	}
 
 	showAnError(textOfError){
-		const index = this.state.errors.length
-		this.setState({ errors: [...this.state.errors, textOfError] })
-		setTimeout( () => this.setState({  errors: this.state.errors.slice(index, 1)  }), 1000 )
+		let index = this.state.errors.length - 1 
+		const errorToAdd = <ErrorLog text={textOfError} />
+
+		const callback = function(){
+			setTimeout( () => {
+				index = this.state.errors.length - 1 
+				const modelWithoutThisError = this.state.errors
+				modelWithoutThisError.shift()
+				this.setState({  errors: modelWithoutThisError })
+			}, 2000 )
+		}
+
+		this.setState({ errors: [...this.state.errors, errorToAdd] }, callback )
 	}
 
 	logout(){
@@ -110,7 +120,7 @@ class App extends React.Component {
 							}
 						</div>
 						<div className="options">
-							{this.state.errors.map( i => <ErrorLog text={i} />  )}
+							{this.state.errors.map( i=> i)}
 							<AddContact  addContact={this.addContact} />
 						</div>
 					</nav>
