@@ -1,3 +1,10 @@
+$red: #cf2548;
+$blue: #2a5a9f;
+
+body {
+	background-color: $blue;
+}
+
 .WelcomeScreen {
 
     height: 80vh;
@@ -6,33 +13,36 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
 
-    .options-start{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        & > button{
-            width: 150px;
-            height: 5%;
-            margin-bottom: 10px;
-        }
-    }
-    .forms {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        & > input{
-            width: 95%;
-            height: 5%;
-            margin-bottom: 10px;
-        }
+	header {
+		font-size: 3rem;
+	}
+
+	.main{
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		.button-confirm{
+			width: 100%;
+			margin-bottom: 10px;
+		}
+	}
+	.forms {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		& > input{
+			width: 95%;
+			height: 3rem;
+			margin-bottom: 10px;
+		}
 		.alert_error {
 			width: 95%;
 			height: 1rem;
 			display: flex;
 			align-items: center;
 		}
-   }
+	}
 
 }
