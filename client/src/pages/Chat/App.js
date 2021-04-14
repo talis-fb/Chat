@@ -1,14 +1,16 @@
 import React from 'react'
 
-import BlockOfChat from './BlockOfChat/BlockOfChat'
-import WithoutMessages from './WithoutMessages/WithoutMessages'
-import Profile from './Profile/Profile'
-import AddContact from './AddContact/AddContact'
-import SpaceMessageEmpty from './SpaceMessageEmpty/SpaceMessageEmpty'
-import Messages from './Messages/Messages'
-import TextToSend from './TextToSend/TextToSend'
-import Auth from './AuthService/AuthService'
-import ErrorLog from './ErrorLog/ErrorLog'
+import WithoutContacts from './Components/ContactsSpace/WithoutContacts/WithoutContacts'
+import BlockOfContact from './Components/ContactsSpace/BlockOfContact/BlockOfContact'
+import AddContact from './Components/ContactsSpace/AddContact/AddContact'
+
+import SpaceMessageEmpty from './Components/MessagesSpace/SpaceMessageEmpty/SpaceMessageEmpty'
+import Messages from './Components/MessagesSpace/Messages/Messages'
+import TextToSend from './Components/MessagesSpace/TextToSend/TextToSend'
+
+import Auth from './Components/AuthService/AuthService'
+import Profile from './Components/Profile/Profile'
+import ErrorLog from './Components/ErrorLog/ErrorLog'
 
 import './App.scss';
 
@@ -115,8 +117,8 @@ class App extends React.Component {
 						<div className="contacts">
 							{ 
 								contacts.length > 0 
-								? contacts.map( cont => <BlockOfChat name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
-								: <WithoutMessages />
+								? contacts.map( cont => <BlockOfContact name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
+								: <WithoutContacts />
 							}
 						</div>
 						<div className="options">

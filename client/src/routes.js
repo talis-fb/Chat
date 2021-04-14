@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 import Home from './pages/Home_Page/WelcomeScreen'
 import Chat from './pages/Chat/App'
-import Auth from './pages/Chat/AuthService/AuthService'
+import Auth from './pages/Chat/Components/AuthService/AuthService'
 
 const browserWithAuth = () => Auth.getCurrentUser() ? <Chat /> : <Home />
 

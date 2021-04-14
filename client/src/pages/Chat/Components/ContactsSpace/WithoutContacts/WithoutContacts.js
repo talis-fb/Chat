@@ -1,6 +1,6 @@
 import React from 'react'
 
-import './WithoutMessages.scss'
+import './WithoutContacts.scss'
 
 export default function(){
     return(
