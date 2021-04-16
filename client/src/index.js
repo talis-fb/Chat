@@ -5,7 +5,13 @@ import './index.scss';
 import Routes from './routes'
 import Auth from './pages/Chat/Components/AuthService/AuthService'
 
+import Home from './pages/Home_Page/WelcomeScreen'
+import Chat from './pages/Chat/App'
+
+
+const browserWithAuth = Auth.getCurrentUser() 
+
 ReactDOM.render(
-    <Routes />,
+	(browserWithAuth ? <Chat/> : <Home/>),
 	document.getElementById('root')
 )

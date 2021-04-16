@@ -1,19 +1,12 @@
 import React from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
-import { InputGroup, FormControl, Button, ButtonGroup, ToggleButton } from 'react-bootstrap'
+import { Alert, InputGroup, FormControl, Button, ButtonGroup, ToggleButton } from 'react-bootstrap'
 
 import Svg_1 from './assets/group1_.svg'
 import Svg_2 from './assets/group2_.svg'
-
-
-
-const iconUsernameInput = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>`
-const iconPasswordInput = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key-fill" viewBox="0 0 16 16"><path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2zM2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>`
-
-import { Alert } from 'react-bootstrap'
-//import 'bootstrap/dist/css/bootstrap.min.css';
-
+import iconPassword from './assets/iconPasswordInput.svg'
+import iconUser from './assets/iconUserInput.svg'
 import './WelcomeScreen.scss'
+
 
 export default class WelcomeScreen extends React.Component{
     constructor(props){
@@ -47,7 +40,6 @@ export default class WelcomeScreen extends React.Component{
 		let passwordConfirm = this.state.form.passwordConfirm
 
 		let url
-
 		if( this.state.option ){
 			// REGISTER 
 			url = 'http://localhost:3000/register'
@@ -56,7 +48,7 @@ export default class WelcomeScreen extends React.Component{
 			url = 'http://localhost:3000/login'
 		}			
 
-		// both passoword space aren't equals
+		// both passoword space aren't equals on option of create user
 		if( (passwordConfirm !== password) && this.state.option==true ){
 			this.setState({ alert_error: 'Senha inseridas diferentes' })
 			return
@@ -84,7 +76,7 @@ export default class WelcomeScreen extends React.Component{
 			if (token && user) {
 				localStorage.setItem("token", token)
 				localStorage.setItem("user", user)
-				this.setState({ redirect: (<Redirect to="/chat" />) })
+				window.location.reload()
 			}
 
 		})
@@ -112,7 +104,7 @@ export default class WelcomeScreen extends React.Component{
 					
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+							<InputGroup.Text id="basic-addon1"> <img src={iconUser} /> </InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -126,7 +118,8 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+							<InputGroup.Text id="basic-addon1"> <img src={iconPassword} /> </InputGroup.Text>
+
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -141,7 +134,7 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+							<InputGroup.Text id="basic-addon1"><img src={iconPassword} /></InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
