@@ -9,10 +9,10 @@ import './WelcomeScreen.scss'
 
 
 export default class WelcomeScreen extends React.Component{
-    constructor(props){
-        super(props)
+	constructor(props){
+		super(props)
 
-        this.state = {
+		this.state = {
 			form: {
 				nickname: null,
 				password: null,
@@ -20,16 +20,11 @@ export default class WelcomeScreen extends React.Component{
 			},
 			redirect: null, 
 			alert_error: null,
-            option: true
-            /* 
-             * option...
-             * true - NEW USER
-             * false - LOG IN
-             */
-        }
+			option: false // TRUE - New User  ||  FALSE - LOG IN
+		}
 
 		this.handleInputChange = this.handleInputChange.bind(this)
-    }
+	}
 
 	requestFromServer(event){
 		event.preventDefault()
@@ -39,16 +34,10 @@ export default class WelcomeScreen extends React.Component{
 		let password = this.state.form.password
 		let passwordConfirm = this.state.form.passwordConfirm
 
-		let url
-		if( this.state.option ){
-			// REGISTER 
-			url = 'http://localhost:3000/register'
-		} else {
-			// LOGIN 
-			url = 'http://localhost:3000/login'
-		}			
+		let url 
+		url = this.state.option ? 'http://localhost:3000/register' : 'http://localhost:3000/login'
 
-		// both passoword space aren't equals on option of create user
+		// both passoword space aren't equals in option create user
 		if( (passwordConfirm !== password) && this.state.option==true ){
 			this.setState({ alert_error: 'Senha inseridas diferentes' })
 			return
@@ -62,49 +51,49 @@ export default class WelcomeScreen extends React.Component{
 				password: password
 			})  
 		})
-		.then( res => res.json() ) // Transforma a resposta de json para obj
-		.then( res => {
-			if( res.error ){
-				console.log('DEU ERRROO')
-				this.setState({ alert_error: res.error })
-				return
-			}
+			.then( res => res.json() ) // Transforma a resposta de json para obj
+			.then( res => {
+				if( res.error ){
+					console.log('DEU ERRROO')
+					this.setState({ alert_error: res.error })
+					return
+				}
 
-			const token = res.token
-			const user = JSON.stringify(res.user)
+				const token = res.token
+				const user = JSON.stringify(res.user)
 
-			if (token && user) {
-				localStorage.setItem("token", token)
-				localStorage.setItem("user", user)
-				window.location.reload()
-			}
+				if ( token && user ) {
+					localStorage.setItem("token", token)
+					localStorage.setItem("user", user)
+					window.location.reload()
+				}
 
-		})
-		.catch( err => console.log(err))
+			})
+			.catch( err => console.log(err))
 	}
 
-    changeOption(op){
+	changeOption(op){
 		this.setState({ option: op, alert_error: null })
-    }
+	}
 
- 	handleInputChange(event) {
+	handleInputChange(event) {
 		const target = event.target;
-        var value = target.value;
-        const name = target.name;
+		var value = target.value;
+		const name = target.name;
 
-	 	this.setState({ 
+		this.setState({ 
 			form: { ...this.state.form, [name]: value }
 		})
-	 }
+	}
 
 	returnOption(){
 		if(this.state.option){
 			return (
 				<React.Fragment>
-					
+
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1"> <img src={iconUser} /> </InputGroup.Text>
+							<InputGroup.Text className="icone-botao" id="basic-addon1"> <img src={iconUser} /> </InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -118,7 +107,7 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1"> <img src={iconPassword} /> </InputGroup.Text>
+							<InputGroup.Text className="icone-botao" id="basic-addon1"> <img src={iconPassword} /> </InputGroup.Text>
 
 						</InputGroup.Prepend>
 						<FormControl
@@ -134,7 +123,7 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1"><img src={iconPassword} /></InputGroup.Text>
+							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconPassword} /></InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -157,7 +146,7 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconUser} /></InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -172,7 +161,7 @@ export default class WelcomeScreen extends React.Component{
 
 					<InputGroup className="mb-3 name-log">
 						<InputGroup.Prepend>
-							<InputGroup.Text id="basic-addon1">@</InputGroup.Text>
+							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconPassword} /></InputGroup.Text>
 						</InputGroup.Prepend>
 						<FormControl
 							onChange={this.handleInputChange}
@@ -190,7 +179,7 @@ export default class WelcomeScreen extends React.Component{
 			)
 		}
 	}
-    
+
 
 	render(){
 

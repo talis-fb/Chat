@@ -1,12 +1,12 @@
 import React from 'react'
 
-import WithoutContacts from './Components/ContactsSpace/WithoutContacts/WithoutContacts'
-import BlockOfContact from './Components/ContactsSpace/BlockOfContact/BlockOfContact'
-import AddContact from './Components/ContactsSpace/AddContact/AddContact'
+import WithoutContacts from './Components/Space_Contacts/WithoutContacts/WithoutContacts'
+import BlockOfContact from './Components/Space_Contacts/BlockOfContact/BlockOfContact'
+import AddContact from './Components/Space_Contacts/AddContact/AddContact'
 
-import SpaceMessageEmpty from './Components/MessagesSpace/SpaceMessageEmpty/SpaceMessageEmpty'
-import Messages from './Components/MessagesSpace/Messages/Messages'
-import TextToSend from './Components/MessagesSpace/TextToSend/TextToSend'
+import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/SpaceMessageEmpty'
+import Messages from './Components/Space_Messages/Messages/Messages'
+import TextToSend from './Components/Space_Messages/TextToSend/TextToSend'
 
 import Auth from './Components/AuthService/AuthService'
 import Profile from './Components/Profile/Profile'

@@ -13,6 +13,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
 
+
 	header {
 		font-size: 3rem;
 	}
@@ -32,6 +33,9 @@ body {
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		.icone-botao{
+			display: block;
+		}
 		& > input{
 			width: 95%;
 			height: 3rem;
