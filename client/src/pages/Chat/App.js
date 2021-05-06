@@ -32,6 +32,7 @@ class App extends React.Component {
 			errors: [],
 			contacts: {
 				Welcome: {
+					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Hey caba safado!", type: 1},
 						{sender: 1, text: "Como estais??", type: 1},
@@ -39,6 +40,7 @@ class App extends React.Component {
 					]
 				},
 				Franscisgleidson: {
+					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Buenos Dias meu caro", type: 1},
 						{sender: 1, text: "como encontravos nesse presente dia?", type: 1},
@@ -49,23 +51,45 @@ class App extends React.Component {
 			}
 		}
 
+		//Get the concats the user already have
+		fetch( 'http://localhost:3000/returnContacts',  {
+			method: "POST", 
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({ 
+				token: Auth.getToken()
+			})  
+		})
+			.then( res => res.json())
+			.then( a => {
+				console.log(a)
+				if ( a.error ) {
+					Auth.logout()
+					window.location.reload()
+				}
 
+				a.map( e => this.updateContactList(e))
+			} )
+			.catch( err => this.showAnError(err) )
+
+		
+		//Define a operação de add contatos
 		socket.on('newContact', contact => {
 			if ( contact.error ){
-				const log = contact.error
-				this.showAnError(log)
-				return
+				return this.showAnError(contact.error)
 			}
 			this.updateContactList(contact)
 		})
+
 
 		this.openAConversation = this.openAConversation.bind(this)
 		this.addContact = this.addContact.bind(this)
 	}
 
 	updateContactList(obj){
+		// { name: xxxx, msgs: [xxx] }
 		const newContact = { 
 			[obj.name]: { 
+				cod: obj.cod || null,
 				msgs: obj.msgs 
 			}
 		}
@@ -84,14 +108,14 @@ class App extends React.Component {
 		let index = this.state.errors.length - 1 
 		const errorToAdd = <ErrorLog text={textOfError} />
 
-		const callback = function(){
-			setTimeout( () => {
-				index = this.state.errors.length - 1 
-				const modelWithoutThisError = this.state.errors
-				modelWithoutThisError.shift()
-				this.setState({  errors: modelWithoutThisError })
-			}, 2000 )
-		}
+			const callback = function(){
+				setTimeout( () => {
+					index = this.state.errors.length - 1 
+					const modelWithoutThisError = this.state.errors
+					modelWithoutThisError.shift()
+					this.setState({  errors: modelWithoutThisError })
+				}, 2000 )
+			}
 
 		this.setState({ errors: [...this.state.errors, errorToAdd] }, callback )
 	}
@@ -105,6 +129,8 @@ class App extends React.Component {
 		const contacts = Object.keys(this.state.contacts) 
 		const conversationToShow = this.state.conversationToShow 
 
+		console.log(this.state.contacts)
+
 		return (
 			<div className="App">
 				<div className="title">
@@ -117,8 +143,8 @@ class App extends React.Component {
 						<div className="contacts">
 							{ 
 								contacts.length > 0 
-								? contacts.map( cont => <BlockOfContact name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
-								: <WithoutContacts />
+									? contacts.map( cont => <BlockOfContact name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
+									: <WithoutContacts />
 							}
 						</div>
 						<div className="options">
@@ -130,8 +156,8 @@ class App extends React.Component {
 					<div className="messages">
 						{
 							conversationToShow
-							? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
-							: <SpaceMessageEmpty /> 
+								? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
+								: <SpaceMessageEmpty /> 
 						} 
 
 						<TextToSend />

@@ -35,7 +35,7 @@ export default class WelcomeScreen extends React.Component{
 		let passwordConfirm = this.state.form.passwordConfirm
 
 		let url 
-		url = this.state.option ? 'http://localhost:3000/register' : 'http://localhost:3000/login'
+		url = ( this.state.option ) ? 'http://localhost:3000/register' : 'http://localhost:3000/login'
 
 		// both passoword space aren't equals in option create user
 		if( (passwordConfirm !== password) && this.state.option==true ){
@@ -182,8 +182,6 @@ export default class WelcomeScreen extends React.Component{
 
 
 	render(){
-
-		console.log(this.state)
 
 		return(
 			<div className="WelcomeScreen">

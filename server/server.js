@@ -7,7 +7,7 @@ const io = require('socket.io')(http)
 const mongoose = require('mongoose')
 
 const jwt = require('jsonwebtoken')
-const secret = require('crypto').randomBytes(64).toString('hex')
+const secret = 'kiuhfnuisdf9we8hafno9f8e8fuisdbFsd' // require('crypto').randomBytes(64).toString('hex')
 
 // Models
 const MessagesDB = require('./models/Messages')
@@ -49,8 +49,6 @@ app.post('/register', async (req, res) => {
 			return res.status(400).send({ error: "User already exist" })
 		}
 
-		// If it's really a new user...
-
 		// Generate a new Pin random
 		const newPin = Math.random().toString(36).substring(9);
 
@@ -65,10 +63,9 @@ app.post('/register', async (req, res) => {
 		const data = await newUser.save()
 		console.log(data)
 
-		const token = await generateAccessToken({ name: nickname, conversations: {} })
+		const token = generateAccessToken({ name: nickname, pin: newPin })
 		console.log('TOKEN ENVIADOS:')
 		console.log(token)
-
 
 		res.send({
 			registro: true,
@@ -93,7 +90,7 @@ app.post('/login', async (req, res) => {
 		console.log("LOGIN: DADOS RECEBIDOS")
 		console.log(nickname, password)
 
-		// Get the User logging
+		// Get the User logging on database
 		const UserLogging = await UsersDB.findOne({ name: nickname })
 
 		// If the user dont exist
@@ -108,17 +105,22 @@ app.post('/login', async (req, res) => {
 			return res.send({ error: 'senha errada' })
 		}
 
+		const token = generateAccessToken({ name: UserLogging.name, pin: UserLogging.pin })
+		console.log('TOKEN ENVIADOS:')
+		console.log(token)
+
 		const dadesToSendBack = {
 			user: {
 				name: UserLogging.name,
 				pin: UserLogging.pin
 			},
-			token: generateAccessToken(UserLogging.name)
+			token: token
 		}
 
 		console.log('LOGADO: '+ UserLogging.name)
 
 		res.send( dadesToSendBack )
+
 	} catch (err) {
 		console.log(err)
 		return res.status(400).send({ error: err })
@@ -126,10 +128,34 @@ app.post('/login', async (req, res) => {
 
 })
 
+app.post('/returnContacts', async (req, res) => {
+	const { token } = req.body
+
+	let verify
+	let user 
+
+	try {
+		verify = jwt.verify(token, secret)
+		user = await UsersDB.findOne({ name: verify.name }, 'conversations')
+	} catch(err){
+		return res.send({ error: err })
+		console.log('ERRO RETORNO CONTATOS')
+	}
+
+	const conversations = user.conversations
+	const dades = conversations.map( e => { 
+		return {
+			name: e.contact,
+			cod: e.cod,
+			msgs:  []
+		}})
+
+	return res.send( dades)
+})
+
+
 io.on('connection', socket => {
 	console.log(`New user: ${socket.id}`)
-
-	//console.log(findUser('Alone'))
 
 	socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 
@@ -138,6 +164,7 @@ io.on('connection', socket => {
 			socket.emit('newContact', { error: 'contato não encontrado'})
 			return
 		}
+
 		const peopleInSearch = doc.name
 
 		const isThereTalkBefore = doc.conversations.filter( i => i.contact === userRequesting.name )

@@ -1,4 +1,3 @@
-import React from 'react'
 
 const API_URL = "http://localhost:3000";
 
@@ -8,7 +7,7 @@ class AuthService {
 	}
 
 	getToken(){
-		return JSON.parse(localStorage.getItem('token'));;
+		return localStorage.getItem('token');
 	}
 
 	logout(){
