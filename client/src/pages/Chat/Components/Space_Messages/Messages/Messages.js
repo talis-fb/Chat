@@ -3,10 +3,6 @@ import React from 'react'
 import './Messages.scss';
 
 export default class Messages extends React.Component{
-    constructor(props){
-        super(props)
-    }
-
     messageFromUser(msg){
         return (
             <div className="box-msg">
@@ -27,22 +23,29 @@ export default class Messages extends React.Component{
         )
     }
 
+	withoutMessages(){
+		return (
+			<div class="box-msg-empty">
+				<span>CONVERSA VAZIA</span>
+				<span>Puxe um papo!</span>
+			</div>
+		)
+	}
+
     render(){
         const messages = this.props.msgs
-        
-        let box_of_messages = null
 
-		box_of_messages = messages.map( i => {
-			switch(i.sender){
-				case 1: return this.messageFromUser(i.text ) 
-				case 2:	return this.messageFromFriend(i.text )
-			}
+		const box_of_messages = messages.map( i => {
+			if ( i.sender==1 ) return this.messageFromUser(i.text) 
+			if ( i.sender==2 ) return this.messageFromFriend(i.text)
 		})
+
+		const withoutMessages = this.withoutMessages()
 
         //If it doesn't received messages in props, the 'box_of_messages' keeps null
         return(
             <div className="messages-chat">
-                { box_of_messages}
+				{ messages.length ? box_of_messages : withoutMessages }
             </div>
         )
     }

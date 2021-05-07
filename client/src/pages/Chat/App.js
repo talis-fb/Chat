@@ -1,9 +1,11 @@
 import React from 'react'
 
+// Space Contacts Components
 import WithoutContacts from './Components/Space_Contacts/WithoutContacts/WithoutContacts'
 import BlockOfContact from './Components/Space_Contacts/BlockOfContact/BlockOfContact'
 import AddContact from './Components/Space_Contacts/AddContact/AddContact'
 
+// Space Messages Components
 import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/SpaceMessageEmpty'
 import Messages from './Components/Space_Messages/Messages/Messages'
 import TextToSend from './Components/Space_Messages/TextToSend/TextToSend'
@@ -14,6 +16,7 @@ import ErrorLog from './Components/ErrorLog/ErrorLog'
 
 import './App.scss';
 
+// socket.io
 import client from 'socket.io-client';
 var socket = client('http://localhost:3000/')
 
@@ -21,12 +24,10 @@ class App extends React.Component {
 	constructor(props){
 		super(props)
 
-		const user = Auth.getCurrentUser()
-
 		this.state = {
 			dadesOfUser:{
-				name: user.name,
-				pin: user.pin
+				name: Auth.getCurrentUser().name,
+				pin: Auth.getCurrentUser().pin
 			},
 			conversationToShow: 0,
 			errors: [],
@@ -51,41 +52,15 @@ class App extends React.Component {
 			}
 		}
 
-		//Get the concats the user already have
-		fetch( 'http://localhost:3000/returnContacts',  {
-			method: "POST", 
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({ 
-				token: Auth.getToken()
-			})  
-		})
-			.then( res => res.json())
-			.then( a => {
-				console.log(a)
-				if ( a.error ) {
-					Auth.logout()
-					window.location.reload()
-				}
 
-				a.map( e => this.updateContactList(e))
-			} )
-			.catch( err => this.showAnError(err) )
-
-		
-		//Define a operação de add contatos
-		socket.on('newContact', contact => {
-			if ( contact.error ){
-				return this.showAnError(contact.error)
-			}
-			this.updateContactList(contact)
-		})
-
+		this.defineFunctionSocket()
+		this.updateContactList()
 
 		this.openAConversation = this.openAConversation.bind(this)
 		this.addContact = this.addContact.bind(this)
 	}
 
-	updateContactList(obj){
+	addANewContact(obj){
 		// { name: xxxx, msgs: [xxx] }
 		const newContact = { 
 			[obj.name]: { 
@@ -94,6 +69,29 @@ class App extends React.Component {
 			}
 		}
 		this.setState({ contacts: { ...this.state.contacts, ...newContact } })
+	}
+
+	defineFunctionSocket(){
+		//Define a operação de adicionar contatos
+		socket.on('newContact', contact => {
+			if ( contact.error ) return this.showAnError(contact.error)
+			this.addANewContact(contact)
+		})
+	}
+
+	updateContactList(){
+		//Get the concats the user already have
+		fetch( 'http://localhost:3000/returnContacts',  {
+			method: "POST", 
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({ token: Auth.getToken() })  
+		})
+			.then( res => res.json())
+			.then( res => {
+				if ( res.error ) return this.logout()
+				res.map( i => this.addANewContact(i))
+			})
+			.catch( err => this.showAnError(err) )
 	}
 
 	openAConversation(name_of_contact){
@@ -108,20 +106,21 @@ class App extends React.Component {
 		let index = this.state.errors.length - 1 
 		const errorToAdd = <ErrorLog text={textOfError} />
 
-			const callback = function(){
-				setTimeout( () => {
-					index = this.state.errors.length - 1 
-					const modelWithoutThisError = this.state.errors
-					modelWithoutThisError.shift()
-					this.setState({  errors: modelWithoutThisError })
-				}, 2000 )
-			}
+		const callback = function(){
+			setTimeout( () => {
+				index = this.state.errors.length - 1 
+				const modelWithoutThisError = this.state.errors
+				modelWithoutThisError.shift()
+				this.setState({  errors: modelWithoutThisError })
+			}, 2000 )
+		}
 
 		this.setState({ errors: [...this.state.errors, errorToAdd] }, callback )
 	}
 
 	logout(){
 		Auth.logout()
+		window.location.reload()
 	}
 
 	render(){
