@@ -1,5 +1,5 @@
 import React from 'react'
-import './AddContact.scss'
+import './ButtonAddContact.scss'
 
 class AddContact extends React.Component {
     constructor(props){

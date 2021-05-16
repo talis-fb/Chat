@@ -1,9 +1,8 @@
 import React from 'react'
 
 // Space Contacts Components
-import WithoutContacts from './Components/Space_Contacts/WithoutContacts/WithoutContacts'
-import BlockOfContact from './Components/Space_Contacts/BlockOfContact/BlockOfContact'
-import AddContact from './Components/Space_Contacts/AddContact/AddContact'
+import ButtonAddContact from './Components/Space_Contacts/ButtonAddContact/ButtonAddContact'
+import Contacts from './Components/Space_Contacts/Contacts/Contacts'
 
 // Space Messages Components
 import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/SpaceMessageEmpty'
@@ -31,8 +30,9 @@ class App extends React.Component {
 			},
 			conversationToShow: 0,
 			errors: [],
-			contacts: {
-				Welcome: {
+			contacts: [
+				 {
+					name: 'Welcome',
 					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Hey caba safado!", type: 1},
@@ -40,7 +40,8 @@ class App extends React.Component {
 						{sender: 1, text: "Bem-vindo a esse app porreta dms", type: 1}
 					]
 				},
-				Franscisgleidson: {
+				{
+					name: 'Francisgleidon',
 					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Buenos Dias meu caro", type: 1},
@@ -49,7 +50,7 @@ class App extends React.Component {
 						{sender: 1, text: "Massa, agr temos algo nessa conversa de exemplo", type: 1}
 					]
 				}
-			}
+			]
 		}
 
 
@@ -60,15 +61,9 @@ class App extends React.Component {
 		this.addContact = this.addContact.bind(this)
 	}
 
-	addANewContact(obj){
+	addANewContact(new_contact){
 		// { name: xxxx, msgs: [xxx] }
-		const newContact = { 
-			[obj.name]: { 
-				cod: obj.cod || null,
-				msgs: obj.msgs 
-			}
-		}
-		this.setState({ contacts: { ...this.state.contacts, ...newContact } })
+		this.setState({ contacts: [ ...this.state.contacts, new_contact ] })
 	}
 
 	defineFunctionSocket(){
@@ -95,7 +90,8 @@ class App extends React.Component {
 	}
 
 	openAConversation(name_of_contact){
-		this.setState({ conversationToShow: name_of_contact })
+		const cont = this.state.contacts.filter( i => i.name == name_of_contact )
+		this.setState({ conversationToShow: cont.name })
 	}
 
 	addContact(pinForAdd){
@@ -140,27 +136,22 @@ class App extends React.Component {
 					<nav className="space-of-contacts">
 						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
 						<div className="contacts">
-							{ 
-								contacts.length > 0 
-									? contacts.map( cont => <BlockOfContact name={cont} msg={this.state.contacts[cont].msgs} click={this.openAConversation} /> ) 
-									: <WithoutContacts />
-							}
+							<Contacts  contacts={this.state.contacts} click={this.openAConversation} />
 						</div>
 						<div className="options">
-							{this.state.errors.map( i=> i)}
-							<AddContact  addContact={this.addContact} />
+							{this.state.errors.map( i => i)}
+							<ButtonAddContact  addContact={this.addContact} />
 						</div>
 					</nav>
 
-					<div className="messages">
+					<nav className="space-of-messages">
 						{
 							conversationToShow
 								? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
 								: <SpaceMessageEmpty /> 
 						} 
-
 						<TextToSend />
-					</div>
+					</nav>
 				</div>
 			</div>
 		);

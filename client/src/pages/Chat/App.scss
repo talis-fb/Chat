@@ -49,18 +49,12 @@ body {
 				flex-direction: column;
 			}
 		}
-		.messages {
+		.space-of-messages {
 			background-color: #282D33;
 			width: 100%;
 			height: 100%;
 			display: grid;
 			grid-template-rows: auto 50px;
-			.space-msg-empty{
-				svg {
-					width: 25%;
-					height: auto;
-				}
-			}
 		}
 	}
 }
