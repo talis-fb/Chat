@@ -33,7 +33,12 @@ export default class Messages extends React.Component{
 	}
 
     render(){
-        const messages = this.props.msgs
+
+		// If the chat has the props 'screen' means it is a screen to show
+		// and not a chat. So, it just return the element of that screen
+		if ( this.props.chat.screen ) return this.props.chat.element
+
+        const messages = this.props.chat.msgs
 		const box_of_messages = messages.map( i => {
 			if ( i.sender==1 ) return this.messageFromUser(i.text) 
 			if ( i.sender==2 ) return this.messageFromFriend(i.text)

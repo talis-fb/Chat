@@ -6,11 +6,14 @@ import WithoutContacts from './WithoutContacts/WithoutContacts'
 export default function (props){
 	if ( !props.contacts.length ) return  <WithoutContacts /> 
 
-		const handleClick = props.click
+	const handleClick = props.click
 
-	const handleContact = ( cont, index ) => {
+	const handleContacts = ( cont, index ) => {
+		// If it's a screen will not render at list
+		if ( cont.screen ) return null
+
 		const name = cont.name
-		const last_message = cont.msgs[ cont.msgs.length-1 ] // { name: 'xxxx', msgs: [{..}, {..}] }
+		const last_message = cont.msgs[ cont.msgs.length-1 ] // cont = { name: 'xxxx', msgs: [{..}, {..}] }
 
 		let message_to_display = null
 
@@ -25,7 +28,7 @@ export default function (props){
 		return <BlockOfContact name={name} msg={message_to_display} click={handleClick} index={index}  />
 	}
 
-	const list_of_contacts = props.contacts.map(handleContact)
+	const list_of_contacts = props.contacts.map(handleContacts)
 
 	return (
 		<div className="contacts">

@@ -28,12 +28,19 @@ class App extends React.Component {
 				name: Auth.getCurrentUser().name,
 				pin: Auth.getCurrentUser().pin
 			},
-			conversationToShow: null, // It's a number, of the index of conversation wanted
+			conversationToShow: 0, // It's a number, of the index of conversation wanted. Start with the screen of Welcome
 			errors: [],
 			contacts: [
-				 {
+				{ 
+					// The first chat is the screen of welcome.
+					// A element with 'screen:true' in this array will 
+					// not render messages and just render the element 
+					// and the key 'element'
+					screen: true,
+					element: <SpaceMessageEmpty />
+				},
+				{
 					name: 'Welcome',
-					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Hey caba safado!", type: 1},
 						{sender: 1, text: "Como estais??", type: 1},
@@ -42,7 +49,6 @@ class App extends React.Component {
 				},
 				{
 					name: 'Francisgleidon',
-					cod: 'xxx',
 					msgs: [
 						{sender: 1, text: "Buenos Dias meu caro", type: 1},
 						{sender: 1, text: "como encontravos nesse presente dia?", type: 1},
@@ -132,17 +138,15 @@ class App extends React.Component {
 				<div className="chat">
 					<nav className="space-of-contacts">
 						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
-						<Contacts  contacts={this.state.contacts} click={this.openAConversation} />
+						<Contacts contacts={this.state.contacts} click={this.openAConversation} />
 						<div className="options">
-							{this.state.errors.map( i => i)}
+							{this.state.errors.map( i => i )}
 							<ButtonAddContact  addContact={this.addContact} />
 						</div>
 					</nav>
 
 					<nav className="space-of-messages">
-						{ conversationToShow !== null
-								? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
-								: <SpaceMessageEmpty /> } 
+						<Messages chat={this.state.contacts[conversationToShow]} /> 
 						<TextToSend />
 					</nav>
 				</div>
