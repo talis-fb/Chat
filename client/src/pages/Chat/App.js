@@ -9,7 +9,7 @@ import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/Spa
 import Messages from './Components/Space_Messages/Messages/Messages'
 import TextToSend from './Components/Space_Messages/TextToSend/TextToSend'
 
-import Auth from './Components/AuthService/AuthService'
+import Auth from '../AuthService'
 import Profile from './Components/Profile/Profile'
 import ErrorLog from './Components/ErrorLog/ErrorLog'
 
@@ -28,7 +28,7 @@ class App extends React.Component {
 				name: Auth.getCurrentUser().name,
 				pin: Auth.getCurrentUser().pin
 			},
-			conversationToShow: null, // It's a number, of the index of conversation wished
+			conversationToShow: null, // It's a number, of the index of conversation wanted
 			errors: [],
 			contacts: [
 				 {
@@ -61,7 +61,7 @@ class App extends React.Component {
 		this.addContact = this.addContact.bind(this)
 	}
 
-	addANewContact(new_contact){
+	save_contact_on_list(new_contact){
 		// { name: xxxx, msgs: [xxx] }
 		this.setState({ contacts: [ ...this.state.contacts, new_contact ] })
 	}
@@ -69,8 +69,8 @@ class App extends React.Component {
 	defineFunctionSocket(){
 		//Define a operação de adicionar contatos
 		socket.on('newContact', contact => {
-			if ( contact.error ) return this.showAnError(contact.error)
-			this.addANewContact(contact)
+			if ( contact.error ) return this.show_an_error(contact.error)
+			this.save_contact_on_list(contact)
 		})
 	}
 
@@ -84,9 +84,9 @@ class App extends React.Component {
 			.then( res => res.json())
 			.then( res => {
 				if ( res.error ) return this.logout()
-				res.map( i => this.addANewContact(i))
+				res.map( i => this.save_contact_on_list(i))
 			})
-			.catch( err => this.showAnError(err) )
+			.catch( err => this.show_an_error(err) )
 	}
 
 	openAConversation(index_of_contact){
@@ -97,7 +97,7 @@ class App extends React.Component {
 		socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
 	}
 
-	showAnError(textOfError){
+	show_an_error(textOfError){
 		let index = this.state.errors.length - 1 
 		const errorToAdd = <ErrorLog text={textOfError} />
 
@@ -123,8 +123,6 @@ class App extends React.Component {
 		const contacts = Object.keys(this.state.contacts) 
 		const conversationToShow = this.state.conversationToShow 
 
-		console.log(this.state.contacts)
-
 		return (
 			<div className="App">
 				<div className="title">
@@ -134,9 +132,7 @@ class App extends React.Component {
 				<div className="chat">
 					<nav className="space-of-contacts">
 						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
-						<div className="contacts">
-							<Contacts  contacts={this.state.contacts} click={this.openAConversation} />
-						</div>
+						<Contacts  contacts={this.state.contacts} click={this.openAConversation} />
 						<div className="options">
 							{this.state.errors.map( i => i)}
 							<ButtonAddContact  addContact={this.addContact} />
@@ -144,11 +140,9 @@ class App extends React.Component {
 					</nav>
 
 					<nav className="space-of-messages">
-						{
-							conversationToShow || conversationToShow===0
+						{ conversationToShow !== null
 								? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
-								: <SpaceMessageEmpty /> 
-						} 
+								: <SpaceMessageEmpty /> } 
 						<TextToSend />
 					</nav>
 				</div>
