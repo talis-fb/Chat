@@ -8,10 +8,10 @@ export default function (props){
 
 	const handleClick = props.click
 
-	const handleContact = cont => {
+	const handleContact = ( cont, index ) => {
 		const name = cont.name
 		const last_message = cont.msgs.length ? cont.msgs[ cont.msgs.length-1 ].text : null // Ta feio
-		return <BlockOfContact name={name} msg={last_message} click={handleClick}  />
+		return <BlockOfContact name={name} msg={last_message} click={handleClick} index={index}  />
 	}
 
 	const list_of_contacts = props.contacts.map(handleContact)

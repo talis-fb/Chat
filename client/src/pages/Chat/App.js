@@ -28,7 +28,7 @@ class App extends React.Component {
 				name: Auth.getCurrentUser().name,
 				pin: Auth.getCurrentUser().pin
 			},
-			conversationToShow: 0,
+			conversationToShow: null, // It's a number, of the index of conversation wished
 			errors: [],
 			contacts: [
 				 {
@@ -89,9 +89,8 @@ class App extends React.Component {
 			.catch( err => this.showAnError(err) )
 	}
 
-	openAConversation(name_of_contact){
-		const cont = this.state.contacts.filter( i => i.name == name_of_contact )
-		this.setState({ conversationToShow: cont.name })
+	openAConversation(index_of_contact){
+		this.setState({ conversationToShow: index_of_contact })
 	}
 
 	addContact(pinForAdd){
@@ -146,7 +145,7 @@ class App extends React.Component {
 
 					<nav className="space-of-messages">
 						{
-							conversationToShow
+							conversationToShow || conversationToShow===0
 								? <Messages msgs={this.state.contacts[conversationToShow].msgs} /> 
 								: <SpaceMessageEmpty /> 
 						} 
