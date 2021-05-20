@@ -139,7 +139,6 @@ app.post('/returnContacts', async (req, res) => {
 
 	let verify
 	let user 
-
 	try {
 		verify = jwt.verify(token, secret)
 		user = await UsersDB.findOne({ name: verify.name }, 'conversations')
@@ -149,14 +148,81 @@ app.post('/returnContacts', async (req, res) => {
 	}
 
 	const conversations = user.conversations
-	const dades = conversations.map( e => { 
-		return {
-			name: e.contact,
-			cod: e.cod,
-			msgs:  []
-		}})
+
+	let dades = []
+	for(let c in conversations){
+		const user_found = await UsersDB.findOne({ pin: conversations[c].contact }, 'name')
+		dades[c] = { name: user_found.name, msgs: []}
+	}
+
+	console.log('Atualização de contatos...')
+	console.log(dades)
 
 	return res.send( dades)
+})
+
+app.post('/addContact', async (req, res) => {
+
+	const { pin_to_get, pin_user_requesting, name } = req.body
+
+	console.log('pessoa quem add')
+	console.log(pin_user_requesting)
+	console.log('PEssoa em busca')
+	console.log(pin_to_get)
+
+	//If the Pin received is the same of who is requesting
+	if( pin_to_get===pin_user_requesting ) {
+		return res.send({ error: 'PIN Invalido' })
+	}
+
+	const user_found = await UsersDB.findOne({ pin: pin_to_get }, 'name pin conversations')
+	if( !user_found ){
+		// socket.emit('newContact', { error: 'contato não encontrado'})
+		return res.send({ error: 'contato não encontrado' })
+	}
+
+	console.log('user pego')
+	console.log(user_found)
+
+	const isThereTalkBefore = user_found.conversations.filter( i => i.contact === pin_user_requesting )
+	if ( isThereTalkBefore[0] ){
+		console.log('TEM CONVERSA JÁ MEU CHAPA')
+		return res.send({ error: 'já adicionado'})
+	}
+
+	console.log('CRIA O TALK')
+
+	//Creation of code the new conversation
+	const codeOfConv = Math.random().toString(36).substring(9);
+
+	//SET the conversation on database of both users
+	const user1 = await UsersDB.updateOne( { pin:pin_to_get }, {
+		$push: { //Insert a new item in array conversations of user
+			conversations: {
+				contact: pin_user_requesting,
+				type: 2,
+				cod: codeOfConv
+			}	
+		}
+	})
+	const user2 = await UsersDB.updateOne( { pin:pin_user_requesting }, {
+		$push: { //Insert a new item in array conversations of user
+			conversations: {
+				contact: user_found.pin,
+				type: 1,
+				cod: codeOfConv
+			}	
+		}
+	})
+
+	//SENDING BACK for the socket
+	const conversation = {
+		name: user_found.name,
+		msgs: []
+	}
+	console.log('CONVERDA')
+	console.log(conversation)
+	return res.send(conversation)
 })
 
 
@@ -164,66 +230,9 @@ io.on('connection', socket => {
 	console.log(`New user: ${socket.id}`)
 
 	socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
-
-		const doc = await UsersDB.findOne({ pin: pinFromWhoAdd }, 'name conversations')
-		if( !doc ){
-			socket.emit('newContact', { error: 'contato não encontrado'})
-			return
-		}
-
-		const peopleInSearch = doc.name
-
-		const isThereTalkBefore = doc.conversations.filter( i => i.contact === userRequesting.name )
-		if ( isThereTalkBefore[0] ){
-			console.log('TEM CONVERSA JÁ MEU CHAPA')
-			socket.emit('newContact', { error: 'já adicionado'})
-			return
-		}
-
-		console.log('pessoa quem add')
-		console.log(userRequesting.name)
-		console.log('PEssoa em busca')
-		console.log(peopleInSearch)
-
-		//If the Pin received is the same of who is requesting
-		if( pinFromWhoAdd===userRequesting.pin ) {
-			socket.emit('newContact', { error: 'PIN invalido'})
-			return
-		}
-
-		console.log('CRIA O TALK')
-
-		//Creation of code the new conversation
-		const codeOfConv = Math.random().toString(36).substring(9);
-
-		//SET the conversation on database of both users
-		const user1 = await UsersDB.updateOne( { pin:pinFromWhoAdd }, {
-			$push: { //Insert a new item in array conversations of user
-				conversations: {
-					contact: userRequesting.name,
-					type: 2,
-					cod: codeOfConv
-				}	
-			}
-		})
-		const user2 = await UsersDB.updateOne( { pin:userRequesting.pin }, {
-			$push: { //Insert a new item in array conversations of user
-				conversations: {
-					contact: peopleInSearch,
-					type: 1,
-					cod: codeOfConv
-				}	
-			}
-		})
-
-		//SENDING BACK for the socket
-		const conversation = {
-			name: peopleInSearch,
-			msgs: []
-		}
-		console.log('CONVERDA')
-		console.log(conversation)
-		socket.emit('newContact', conversation)//{ `${name}`: msgs: [] })
+		/* 
+		 * #########################################
+		 */
 	})
 
 	socket.on('disconnect', () => {

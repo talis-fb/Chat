@@ -13,7 +13,8 @@ export default function (props){
 		if ( cont.screen ) return null
 
 		const name = cont.name
-		const last_message = cont.msgs[ cont.msgs.length-1 ] // cont = { name: 'xxxx', msgs: [{..}, {..}] }
+		const last_message = '' // cont.msgs[ cont.msgs.length-1 ] || '' // cont = { name: 'xxxx', msgs: [{..}, {..}] }
+		// erro em pegar o tamanho desse array..
 
 		let message_to_display = null
 

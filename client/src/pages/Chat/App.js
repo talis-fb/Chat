@@ -90,6 +90,7 @@ class App extends React.Component {
 			.then( res => res.json())
 			.then( res => {
 				if ( res.error ) return this.logout()
+				console.log(res)
 				res.map( i => this.save_contact_on_list(i))
 			})
 			.catch( err => this.show_an_error(err) )
@@ -100,21 +101,36 @@ class App extends React.Component {
 	}
 
 	addContact(pinForAdd){
-		socket.emit('addContact', pinForAdd, this.state.dadesOfUser)
+		fetch( 'http://localhost:3000/addContact',  {
+			method: "POST", 
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({ 
+				pin_to_get: pinForAdd,
+				pin_user_requesting: this.state.dadesOfUser.pin,
+				name: this.state.dadesOfUser.name
+			})  
+		})
+			.then( res => res.json())
+			.then( res => {
+				// if ( res.error ) console.log(res)
+				console.log(res)
+				// res.map( i => this.save_contact_on_list(i))
+			})
+			.catch( err => this.show_an_error(err) )
 	}
 
 	show_an_error(textOfError){
 		let index = this.state.errors.length - 1 
 		const errorToAdd = <ErrorLog text={textOfError} />
 
-		const callback = function(){
-			setTimeout( () => {
-				index = this.state.errors.length - 1 
-				const modelWithoutThisError = this.state.errors
-				modelWithoutThisError.shift()
-				this.setState({  errors: modelWithoutThisError })
-			}, 2000 )
-		}
+			const callback = function(){
+				setTimeout( () => {
+					index = this.state.errors.length - 1 
+					const modelWithoutThisError = this.state.errors
+					modelWithoutThisError.shift()
+					this.setState({  errors: modelWithoutThisError })
+				}, 2000 )
+			}
 
 		this.setState({ errors: [...this.state.errors, errorToAdd] }, callback )
 	}
@@ -128,6 +144,8 @@ class App extends React.Component {
 		// every name of contacts
 		const contacts = Object.keys(this.state.contacts) 
 		const conversationToShow = this.state.conversationToShow 
+
+		console.log(this.state)
 
 		return (
 			<div className="App">
