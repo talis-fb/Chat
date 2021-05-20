@@ -1,21 +1,26 @@
 .box-text{
 
-    display: grid;
-    padding: 5px;
+	display: grid;
+	padding: 5px;
 
-    grid-template-columns: auto 50px;
+	grid-template-columns: auto 50px;
 
-    background-color: grey;
+	background-color: grey;
 
-    .text {
-        background-color: rgb(90, 88, 88);
-        font-family: 'Ubuntu';
-        outline: 0;
-        border-radius: 10px;
-    }
+	.text {
+		background-color: rgb(90, 88, 88);
+		font-family: 'Ubuntu';
+		color: white;
+		outline: 0;
+		border-radius: 10px;
+	}
 
-    svg{
-        width: 70%;
-        height: 70%;
-    }
+	button {
+		border: none;
+		background: none;
+		svg{
+			width: 70%;
+			height: 70%;
+		}
+	}
 }

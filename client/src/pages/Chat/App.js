@@ -147,7 +147,7 @@ class App extends React.Component {
 
 					<nav className="space-of-messages">
 						<Messages chat={this.state.contacts[conversationToShow]} /> 
-						<TextToSend />
+						<TextToSend  />
 					</nav>
 				</div>
 			</div>

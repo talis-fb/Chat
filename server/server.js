@@ -128,6 +128,12 @@ app.post('/login', async (req, res) => {
 
 })
 
+app.post('/msg', (req,res) => {
+	console.log('aaaaaa')
+	console.log(req.body)
+	console.log(req.headers.token)
+})
+
 app.post('/returnContacts', async (req, res) => {
 	const { token } = req.body
 
