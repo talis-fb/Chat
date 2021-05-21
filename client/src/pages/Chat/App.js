@@ -63,6 +63,7 @@ class App extends React.Component {
 		this.defineFunctionSocket()
 		this.updateContactList()
 
+		this.submit = this.submit.bind(this)
 		this.openAConversation = this.openAConversation.bind(this)
 		this.addContact = this.addContact.bind(this)
 	}
@@ -77,6 +78,10 @@ class App extends React.Component {
 		socket.on('newContact', contact => {
 			if ( contact.error ) return this.show_an_error(contact.error)
 			this.save_contact_on_list(contact)
+		})
+
+		socket.on('new_message', (msg, contact) => {
+			//
 		})
 	}
 
@@ -112,9 +117,9 @@ class App extends React.Component {
 		})
 			.then( res => res.json())
 			.then( res => {
-				// if ( res.error ) console.log(res)
+				if ( res.error ) return this.show_an_error(res.error)
 				console.log(res)
-				// res.map( i => this.save_contact_on_list(i))
+				this.save_contact_on_list(res)
 			})
 			.catch( err => this.show_an_error(err) )
 	}
@@ -138,6 +143,23 @@ class App extends React.Component {
 	logout(){
 		Auth.logout()
 		window.location.reload()
+	}
+
+	submit(msg){
+		const c =  this.state.conversationToShow 
+		const contact = this.state.contacts[c]
+
+		console.log('Mensagem ')
+		console.log(contact)
+
+			socket.emit('send_message', { 
+				message: msg,
+				name: contact.name,
+				destination: contact.cod,
+				type: contact.type,
+				token: Auth.getToken()
+			})
+
 	}
 
 	render(){
@@ -165,7 +187,7 @@ class App extends React.Component {
 
 					<nav className="space-of-messages">
 						<Messages chat={this.state.contacts[conversationToShow]} /> 
-						<TextToSend  />
+						<TextToSend  submit={this.submit} />
 					</nav>
 				</div>
 			</div>
