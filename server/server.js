@@ -146,11 +146,14 @@ app.post('/returnContacts', async (req, res) => {
 	let dades = []
 	for(let c in conversations){
 		const user_found = await UsersDB.findOne({ pin: conversations[c].contact }, 'name')
+		const messages_found = await MessagesDB.findOne({ pin: conversations[c].cod }, 'messages')
+		const messages = messages_found.messages
+
 		dades[c] = { 
 			name: user_found.name, 
 			cod: conversations[c].cod, 
 			type: conversations[c].type,
-			msgs: []
+			msgs: [...messages] // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
 		}
 	}
 
@@ -207,8 +210,6 @@ async function create_chat(chat, first_message){
 	console.log('Msg: ')
 	console.log(first_message)
 
-	
-	//###################
 	const user_found = await UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
 	if( !user_found ){
 		return { error: 'contato não encontrado' }
@@ -217,12 +218,23 @@ async function create_chat(chat, first_message){
 	console.log('user pego')
 	console.log(user_found)
 
+
 	console.log('CRIA O TALK')
 
 	//Creation of code the new conversation
 	const codeOfConv = Math.random().toString(36).substring(9);
 
-	//SET the conversation on database of both users
+	// Set the new conversation on database 'messages'
+	let message = new MessagesDB({
+		pin: codeOfConv,
+		messages: [{ sender:1, text: first_message }]	
+	})
+	const res = await message.save()
+	console.log('NOVA CONVERSA ON DB')
+	console.log(res)
+
+
+	// UPDATE the conversation on database of both users
 	const user1 = await UsersDB.updateOne( { pin: pin_1 }, {
 		$push: { //Insert a new item in array conversations of user
 			conversations: {
@@ -241,18 +253,10 @@ async function create_chat(chat, first_message){
 			}	
 		}
 	})
-	//####################
-
-
-	// Send message
-	let message = new MessagesDB({
-		pin: codeOfConv,
-		messages: [{ sender:1, text: first_message }]	
-	})
 
 
 	console.log('conversa criada')
-	return
+	return codeOfConv // return the code of chat made
 }
 
 
@@ -269,7 +273,7 @@ io.on('connection', socket => {
 		console.log('RECEBBBIDADASDA')
 		console.log(sender)
 
-		const { message, token, destination, type } = sender
+		let { message, token, destination, type } = sender
 
 		// valide token
 		const verify = jwt.verify(token, secret)
@@ -281,15 +285,18 @@ io.on('connection', socket => {
 
 		// create chat
 		if ( !destination ){
-			console.log('AQUI CRUA A CONVERSA')
-			create_chat({ pin_1: verify.pin, pin_2: pin_of_guy })
+			console.log('AQUI CRIA A CONVERSA')
+
+			// create a new conversation and return the code of it
+			destination = create_chat({ pin_1: verify.pin, pin_2: pin_of_guy }, message)
+
+			// ----------------------------------------------
+			socket.emit( 'new_chat', { name:sender.name, cod: destination, type: 1, msgs: [] } )
+			socket.emit( 'new_message', { cod: destination, msgs: sender.message })
 			return
 		}
 
-		return
-
 		// Send message
-		// const type_of_user = await UsersDB.findOne({ pin: verify.pin }, '')
 		let new_message = await MessagesDB.updateOne( { pin: sender.destination }, {
 				$push: { //Insert a new item in array conversations of user
 					messages: {
@@ -300,8 +307,7 @@ io.on('connection', socket => {
 			})
 		console.log('MENSAGEM SETADA')
 
-
-		return
+		socket.emit( 'new_message', { cod: destination, msg: sender.message })
 	})
 
 	socket.on('disconnect', () => {

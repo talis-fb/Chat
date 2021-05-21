@@ -69,19 +69,20 @@ class App extends React.Component {
 	}
 
 	save_contact_on_list(new_contact){
-		// { name: xxxx, msgs: [xxx] }
+		// { name: xxxx, cod: xxx, msgs: [xxx] }
 		this.setState({ contacts: [ ...this.state.contacts, new_contact ] })
 	}
 
+	//Define a operação de adicionar contatos
 	defineFunctionSocket(){
-		//Define a operação de adicionar contatos
 		socket.on('newContact', contact => {
 			if ( contact.error ) return this.show_an_error(contact.error)
 			this.save_contact_on_list(contact)
 		})
 
-		socket.on('new_message', (msg, contact) => {
-			//
+		socket.on('new_chat', (chat) => {
+			const { msgs, cod, type, name } = chat
+			this.save_contact_on_list(chat)
 		})
 	}
 
