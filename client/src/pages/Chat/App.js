@@ -16,8 +16,8 @@ import ErrorLog from './Components/ErrorLog/ErrorLog'
 import './App.scss';
 
 // socket.io
-import client from 'socket.io-client';
-var socket = client('http://localhost:3000/')
+import { io } from 'socket.io-client';
+var socket = io('http://localhost:3000/', { autoConnect: false } )
 
 class App extends React.Component {
 	constructor(props){
@@ -28,7 +28,7 @@ class App extends React.Component {
 				name: Auth.getCurrentUser().name,
 				pin: Auth.getCurrentUser().pin
 			},
-			conversationToShow: 0, // It's a number, of the index of conversation wanted. Start with the screen of Welcome
+			conversationToShow: 1, // It's a number, of the index of conversation wanted. Start with the screen of Welcome
 			errors: [],
 			contacts: [
 				{ 
@@ -75,6 +75,11 @@ class App extends React.Component {
 
 	//Define a operação de adicionar contatos
 	defineFunctionSocket(){
+
+		socket.onAny((event, ...args) => {
+			console.log(event, args);
+		});
+
 		socket.on('newContact', contact => {
 			if ( contact.error ) return this.show_an_error(contact.error)
 			this.save_contact_on_list(contact)
@@ -153,13 +158,12 @@ class App extends React.Component {
 		console.log('Mensagem ')
 		console.log(contact)
 
-			socket.emit('send_message', { 
-				message: msg,
-				name: contact.name,
-				destination: contact.cod,
-				type: contact.type,
-				token: Auth.getToken()
-			})
+		socket.emit('send_message', { 
+			message: msg,
+			pin: contact.pin,
+			destination: contact.pin,
+			token: Auth.getToken()
+		})
 
 	}
 

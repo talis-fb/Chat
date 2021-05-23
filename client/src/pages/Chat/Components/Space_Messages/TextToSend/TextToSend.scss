@@ -1,21 +1,41 @@
-.box-text{
+@import "../../../../../index";
 
+.box-text{
 	display: grid;
 	padding: 5px;
 
 	grid-template-columns: auto 50px;
 
-	background-color: grey;
-
-	.text {
+	textarea {
 		background-color: rgb(90, 88, 88);
+		background-color: $color-primary-bold;
 		font-family: 'Ubuntu';
-		color: white;
+		font-size: 14pt;
+		color: $color-text;
 		outline: 0;
 		border-radius: 10px;
+		padding: 5px;
+		resize: none;
+
+		max-height: 200px;
+		overflow: auto;
+
+
+		border: solid 3px $color-primary-bold;
+
+		&::-webkit-scrollbar {
+			width: 9px;               /* width of the entire scrollbar */
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: $color-text;    /* color of the scroll thumb */
+			border-radius: 20px;       /* roundness of the scroll thumb */
+			border: 3px solid $color-primary-bold;  /* creates padding around scroll thumb */
+		}
 	}
 
 	button {
+		color: #6b6bf3;
 		border: none;
 		background: none;
 		svg{

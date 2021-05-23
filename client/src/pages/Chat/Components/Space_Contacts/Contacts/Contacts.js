@@ -3,6 +3,8 @@ import React from 'react'
 import BlockOfContact from './BlockOfContact/BlockOfContact'
 import WithoutContacts from './WithoutContacts/WithoutContacts'
 
+import './Contacts.scss'
+
 export default function (props){
 	if ( !props.contacts.length ) return  <WithoutContacts /> 
 
