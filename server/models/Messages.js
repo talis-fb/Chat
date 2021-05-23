@@ -1,29 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Members = new Schema({
-	s1: {
-		type: Number,
-		required: true
-	},
-	s2: {
-		type: Number,
-		required: true
-	}
-})
-
 const Message = new Schema({
-	sender: Number,
-	text: String,
-	type: Number
+	from: String,
+	body: String
 })
 
 const MessagesSchema = new Schema({
-	pin: {
+	cod: {
 		type: String,
-		required: true
+		require: true
 	},
-	// members: { Members },
+	members: [String],
 	messages: [Message]
 });
 
