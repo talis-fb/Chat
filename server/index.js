@@ -1,16 +1,19 @@
 const express = require('express')
+const app = express()
 const path = require('path')
 const bodyParser = require('body-parser')
-const app = express()
-const http = require('http').Server(app)
-const io = require('socket.io')(http, { cors: { origin: "http://localhost:8080"}} ) 
-const routes = require('./routes')
+const Routes = require('./routes')
 
+// Database
 const db = require('./database')
 db.start()
 
+// Socket.IO
+const http = require('http').Server(app)
+const io = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
+
 app.use(express.static(path.join( __dirname, '..','dist')))
-console.log(path.join( __dirname, '..','dist'))
+console.log(path.join( __dirname, '..','dist')) 
 app.set('views', path.join(__dirname,'..', 'dist'))
 
 //Configuration of Body-Parser
@@ -18,40 +21,14 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 //Routes
-app.use(routes)
-
-async function create_chat(chat, first_message){
-	const { pin_1, pin_2 } = chat
-
-	console.log(`pin1 ${pin_1}`)
-	console.log(`pin2 ${pin_2}`)
-	console.log('Msg: ')
-	console.log(first_message)
-
-	const user_found = await db.return_user_with_pin(pin_2) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
-	if( !user_found ){
-		return { error: 'contato não encontrado' }
-	}
-
-	console.log('user pego')
-	console.log(user_found)
-
-	console.log('CRIA O TALK')
-
-	// Set the new conversation on database 'messages'
-	let message = db.new_conversation( [pin_1,pin_2], first_message )
-
-	// UPDATE the conversation on database of both users
-	const user1 = db.add_new_contact( pin_1, pin2 )
-	const user2 = db.add_new_contact( pin_2, pin1 )
-
-	console.log('conversa criada')
-	return codeOfConv // return the code of chat made
-}
-
+app.use(Routes)
 
 io.on('connection', socket => {
 	console.log(`New user: ${socket.id}`)
+
+	socket.onAny((event, ...args) => {
+		console.log(event, args);
+	});
 
 	socket.on('addContact', async (pinFromWhoAdd, userRequesting) => {
 		/* 
@@ -79,7 +56,7 @@ io.on('connection', socket => {
 			console.log('AQUI CRIA A CONVERSA')
 
 			// create a new conversation and return the code of it
-			destination = create_chat({ 
+			destination = db.create_new_chat({ 
 					pin_1: verify.pin,
 					pin_2: pin_of_guy 
 			}, message)

@@ -1,10 +1,10 @@
 const express = require('express')
-var router = express.Router()
+var Router = express.Router()
 
 const { generateAccessToken, verify_jwt } = require('./auth')
 const db = require('./database')
 
-router
+Router
 	.get('/', (req, res) => {
 		res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
 		console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
@@ -15,15 +15,19 @@ router
 			// Extract dades of request
 			const { nickname, password } = req.body
 
+			// print dades
 			console.log(req.body)
 			console.log("REGISTER: DADOS RECEBIDOS")
 
 			//If user already exist --> return error and finish function
-			const findUser = await db.return_user_with_name(nickname) //UsersDB.findOne({ name: nickname})
-			if( findUser ) {
+			const user_exist = await db.search_user_with_name(nickname) //UsersDB.findOne({ name: nickname})
+			if( user_exist ) {
 				console.log('Nada, CABA JÁ REGISTRADO')
 				return res.status(400).send({ error: "User already exist" })
 			}
+
+			// Generate a new Pin random
+			const newPin = Math.random().toString(36).substring(9);
 
 			db.create_new_user({
 				pin: newPin,
@@ -60,7 +64,7 @@ router
 			console.log(nickname, password)
 
 			// Get the User logging on database
-			const UserLogging = await db.return_user_with_name(nickname, 'password')
+			const UserLogging = await db.search_user_with_name(nickname, 'password')
 
 			// If the user dont exist
 			if ( !UserLogging ){
@@ -104,7 +108,7 @@ router
 		let user 
 		try {
 			verify = verify_jwt(token)
-			doc = await db.return_user_with_name( verify.name ) //UsersDB.findOne({ name: verify.name }, 'conversations')
+			doc = await db.search_user_with_name( verify.name ) //UsersDB.findOne({ name: verify.name }, 'conversations')
 		} catch(err){
 			console.log('ERRO RETORNO CONTATOS')
 			console.log(err)
@@ -112,19 +116,26 @@ router
 		}
 
 		const conversations = doc.conversations
+		return
 
 		let dades = []
 		for(let c in conversations){
-			const user_found = await db.return_user_with_pin( conversations[c].contact ) // UsersDB.findOne({ pin: conversations[c].contact }, 'name pin')
-			const messages_found = await db.return_messages( conversations[c].cod ) //MessagesDB.findOne({ pin: conversations[c].cod }, 'messages')
-			const messages = messages_found.messages
+			let messages_found
+			let user_found
+			try {
+				user_found = await db.search_user_with_pin( conversations[c].contact ) // UsersDB.findOne({ pin: conversations[c].contact }, 'name pin')
+				messages_found = await db.return_messages( conversations[c].cod ) //MessagesDB.findOne({ pin: conversations[c].cod }, 'messages')
+				// messages = (messages_found) ? messages_found.messages : null
+			} catch(err){
+				messages = []
+			}
 
 			dades[c] = { 
-				name: user_found.name, 
-				pin: user_found.pin,
+				// name: user_found.name, 
+				pin: user_found.contact,
 				cod: conversations[c].cod, 
 				// type: conversations[c].type,
-				msgs: [...messages] // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
+				msgs: [...messages_found] // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
 			}
 		}
 
@@ -138,23 +149,15 @@ router
 
 		const { pin_to_get, pin_user_requesting, name } = req.body
 
-		console.log('pessoa quem add')
-		console.log(pin_user_requesting)
-		console.log('PEssoa em busca')
-		console.log(pin_to_get)
-
 		//If the Pin received is the same of who is requesting
 		if( pin_to_get===pin_user_requesting ) {
 			return res.send({ error: 'PIN Invalido' })
 		}
 
-		const user_found = await db.return_user_with_pin( pin_to_get ) //UsersDB.findOne({ pin: pin_to_get }, 'name pin conversations')
+		const user_found = await db.search_user_with_pin( pin_to_get ) //UsersDB.findOne({ pin: pin_to_get }, 'name pin conversations')
 		if( !user_found ){
 			return res.send({ error: 'contato não encontrado' })
 		}
-
-		console.log('user pego')
-		console.log(user_found)
 
 		const isThereTalkBefore = user_found.conversations.filter( i => i.contact === pin_user_requesting )
 		if ( isThereTalkBefore[0] ){
@@ -162,16 +165,13 @@ router
 			return res.send({ error: 'já adicionado'})
 		}
 
-		console.log('envia o contato para o caba')
 		//SENDING BACK for the socket
 		const contact = {
 			name: user_found.name,
 			pin: user_found.pin,
 			msgs: []
 		}
-		console.log('CONVERSA')
-		console.log(contact)
 		return res.send(contact)
 	})
 
-module.exports = router
+module.exports = Router

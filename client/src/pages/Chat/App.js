@@ -160,8 +160,8 @@ class App extends React.Component {
 
 		socket.emit('send_message', { 
 			message: msg,
+			destination: contact.cod,
 			pin: contact.pin,
-			destination: contact.pin,
 			token: Auth.getToken()
 		})
 
