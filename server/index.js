@@ -88,7 +88,7 @@ io.on('connection', socket => {
 			console.log(!!update)
 			if( update ){
 				for( i of update.members ){
-					io.to(i).emit("private message", { cod: to, contect: message, from: user.pin } )
+					io.to(i).emit("private message", { cod: to, body: message, from: user.pin } )
 				}
 			}
 		}catch (err){
