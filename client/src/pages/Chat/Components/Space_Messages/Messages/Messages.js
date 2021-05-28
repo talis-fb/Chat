@@ -1,5 +1,6 @@
 import React from 'react'
 
+import Auth from '../../../../AuthService'
 import './Messages.scss';
 
 export default class Messages extends React.Component{
@@ -38,10 +39,15 @@ export default class Messages extends React.Component{
 		// and not a chat. So, it just return the element of that screen
 		if ( this.props.chat.screen ) return this.props.chat.element
 
-        const messages = this.props.chat.msgs
+		const pin = Auth.getCurrentUser().pin
+
+		const messages = this.props.chat.msgs
 		const box_of_messages = messages.map( i => {
-			if ( i.sender==1 ) return this.messageFromUser(i.text) 
-			if ( i.sender==2 ) return this.messageFromFriend(i.text)
+			if ( i.from===pin ) {
+				return this.messageFromUser(i.body) 
+			} else {
+				return this.messageFromFriend(i.body)
+			}
 		})
 
 		const withoutMessages = this.withoutMessages()

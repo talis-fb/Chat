@@ -14,16 +14,16 @@
         padding: 10px;
         .msg-User{
             border-radius: 10px;
-            background-color: rgb(124, 148, 88);
-            display: inline-block;
-            padding: 20px;
-        }
-        .msg-Friend{
-            border-radius: 10px;
             background-color: rgb(103, 145, 39);
             display: inline-block;
             padding: 20px;
             float: right;
+        }
+        .msg-Friend{
+            border-radius: 10px;
+            background-color: rgb(124, 148, 88);
+            display: inline-block;
+            padding: 20px;
         }
     }
 

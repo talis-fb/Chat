@@ -42,18 +42,18 @@ class App extends React.Component {
 				{
 					name: 'Welcome',
 					msgs: [
-						{sender: 1, text: "Hey caba safado!", type: 1},
-						{sender: 1, text: "Como estais??", type: 1},
-						{sender: 1, text: "Bem-vindo a esse app porreta dms", type: 1}
+						{from: null, body: "Hey caba safado!"},
+						{from: null, body: "Como estais??"},
+						{from: null, body: "Bem-vindo a esse app porreta dms"}
 					]
 				},
 				{
 					name: 'Francisgleidon',
 					msgs: [
-						{sender: 1, text: "Buenos Dias meu caro", type: 1},
-						{sender: 1, text: "como encontravos nesse presente dia?", type: 1},
-						{sender: 2, text: "Muy bien, obg por perguntar", type: 1},
-						{sender: 1, text: "Massa, agr temos algo nessa conversa de exemplo", type: 1}
+						{from: null, body: "Buenos Dias meu caro"},
+						{from: null, body: "como encontravos nesse presente dia?"},
+						{from: Auth.getCurrentUser().pin, body: "Muy bien, obg por perguntar"},
+						{from: null, body: "Massa, agr temos algo nessa conversa de exemplo"}
 					]
 				}
 			]

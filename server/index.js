@@ -68,9 +68,7 @@ io.on('connection', socket => {
 		console.log(event, args);
 	});
 
-	socket.on('first message', async ( pin_to_who, token_sender, message ) => {
-
-	})
+	socket.on('first message', async ( pin_to_who, token_sender, message ) => { })
 
 	socket.on('private message', async ( sender )  =>{
 		console.log('Mensagem enviada...')
