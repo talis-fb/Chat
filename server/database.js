@@ -35,7 +35,6 @@ const manage_users_db = {
 			conversation: []
 		})
 		const data = await newUser.save()
-		console.log(data)
 	},
 	async add_new_contact ( user_adding, who_add ){
 		const doc = await UsersDB.updateOne( { pin: user_adding }, {
@@ -53,20 +52,11 @@ const manage_chat_db = {
 	async create_new_chat (chat, first_message){
 		const { pin_1, pin_2 } = chat
 
-		console.log(`pin1 ${pin_1}`)
-		console.log(`pin2 ${pin_2}`)
-		console.log('Msg: ')
-		console.log(first_message)
 		// await UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
 		const user_found = await check_db.search_user_with_pin(pin_2) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
 		if( !user_found ){
 			return { error: 'contato não encontrado' }
 		}
-
-		console.log('user pego')
-		console.log(user_found)
-
-		console.log('CRIA O TALK')
 
 		// Set the new conversation on database 'messages'
 		let message = this.new_conversation( [pin_1,pin_2], first_message )
@@ -75,7 +65,6 @@ const manage_chat_db = {
 		const user1 = manage_users_db.add_new_contact( pin_1, pin2 )
 		const user2 = manage_users_db.add_new_contact( pin_2, pin1 )
 
-		console.log('conversa criada')
 		return codeOfConv // return the code of chat made
 	},
 
@@ -89,7 +78,6 @@ const manage_chat_db = {
 				}	
 			}
 		})
-		console.log('MENSAGEM SETADA')
 	},
 	
 	// Edit MessagesDB
@@ -105,8 +93,6 @@ const manage_chat_db = {
 			messages: [{ from: pin_1, body: first_message }]	
 		})
 		const res = await message.save()
-		console.log('NOVA CONVERSA ON DB')
-		console.log(res)
 	}
 }
 

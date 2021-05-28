@@ -12,22 +12,24 @@ Router
 
 	.post('/register', async (req, res) => {
 		try{
+			console.log('- Processo de REGISTRO:')
 			// Extract dades of request
 			const { nickname, password } = req.body
 
 			// print dades
+			process.stdout.write(`\t [ok] Dados recebidos:` ) // Um console.log que não quebra linha
 			console.log(req.body)
-			console.log("REGISTER: DADOS RECEBIDOS")
 
 			//If user already exist --> return error and finish function
 			const user_exist = await db.search_user_with_name(nickname) //UsersDB.findOne({ name: nickname})
 			if( user_exist ) {
-				console.log('Nada, CABA JÁ REGISTRADO')
+				console.log(`\t [x] ERRO: Usuario já registrado\n`)
 				return res.status(400).send({ error: "User already exist" })
 			}
 
 			// Generate a new Pin random
 			const newPin = Math.random().toString(36).substring(9);
+			console.log(`\t [ok] NOVO PIN: `+newPin)
 
 			db.create_new_user({
 				pin: newPin,
@@ -37,8 +39,6 @@ Router
 			})
 
 			const token = generateAccessToken({ name: nickname, pin: newPin })
-			console.log('TOKEN ENVIADOS:')
-			console.log(token)
 
 			res.send({
 				registro: true,
@@ -48,8 +48,10 @@ Router
 				},
 				token: token
 			})
+			console.log(`\t [ok] Dados enviados de volta ` ) 
 
 		} catch(err) {
+			console.log(`\t [x] ERRO AO REGISTRAR O USER:` ) 
 			console.log(err)
 			return res.status(400).send({ registro: false, error: err })
 		}
@@ -60,27 +62,31 @@ Router
 		try {
 			const { nickname, password } = req.body
 
-			console.log("LOGIN: DADOS RECEBIDOS")
-			console.log(nickname, password)
+			console.log('- Processo de LOGIN:')
+
+			// print dades
+			process.stdout.write(`\t [ok] Dados recebidos:` ) // Um console.log que não quebra linha
+			console.log( req.body)
 
 			// Get the User logging on database
 			const UserLogging = await db.search_user_with_name(nickname, 'password')
 
 			// If the user dont exist
 			if ( !UserLogging ){
-				console.log("LOGIN: CABA NÃO ENCONTRADO")
+				console.log(`\t [x] Usuario não encontrado`)
 				return res.send({ error: "Usuario nao encontrado" })
 			}
+
+			process.stdout.write(`\t [ok] Usuario Encontrado: ` ) 
 			console.log(UserLogging)
 
 			if ( UserLogging.password !== password ){
-				console.log('Senha errada')
+				console.log(`\t [x] SENHA ERRADA`)
 				return res.send({ error: 'senha errada' })
 			}
 
 			const token = generateAccessToken({ name: UserLogging.name, pin: UserLogging.pin })
-			console.log('TOKEN ENVIADOS:')
-			console.log(token)
+			console.log(`\t [ok] Token gerado`)
 
 			const dadesToSendBack = {
 				user: {
@@ -90,11 +96,10 @@ Router
 				token: token
 			}
 
-			console.log('LOGADO: '+ UserLogging.name)
-
+			console.log(`\t [ok] LOGADO: `+ UserLogging.name)
 			res.send( dadesToSendBack )
-
 		} catch (err) {
+			console.log(`\t [x] ERRO AO LOGAR O USER:` ) 
 			console.log(err)
 			return res.status(400).send({ error: err })
 		}
@@ -104,13 +109,16 @@ Router
 	.post('/returnContacts', async (req, res) => {
 		const { token } = req.body
 
+		console.log('- Retorno de contato: ')
+
 		let verify
 		let user 
 		try {
 			verify = verify_jwt(token)
+			console.log(`\t [ok] TOKEN validado` ) 
 			doc = await db.search_user_with_name( verify.name ) //UsersDB.findOne({ name: verify.name }, 'conversations')
 		} catch(err){
-			console.log('ERRO RETORNO CONTATOS')
+			console.log(`\t [x] ERRO RETORNO CONTATOS: `) 
 			console.log(err)
 			return res.send({ error: err })
 		}
@@ -127,19 +135,21 @@ Router
 				messages_found = await db.return_messages( conversations[c].cod ) //MessagesDB.findOne({ pin: conversations[c].cod }, 'messages')
 				// messages = (messages_found) ? messages_found.messages : null
 			} catch(err){
-				messages = []
+				console.log(err)
+				messages_found = []
 			}
 
 			dades[c] = { 
 				// name: user_found.name, 
 				pin: user_found.contact,
 				cod: conversations[c].cod, 
-				// type: conversations[c].type,
 				msgs: [...messages_found] // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
 			}
 		}
 
-		console.log('Atualização de contatos...')
+
+		console.log(`\t [ok] TOKEN validado` ) 
+		console.log(`\t [ok] Dados enviados:` ) 
 		console.log(dades)
 
 		return res.send( dades)
@@ -161,7 +171,6 @@ Router
 
 		const isThereTalkBefore = user_found.conversations.filter( i => i.contact === pin_user_requesting )
 		if ( isThereTalkBefore[0] ){
-			console.log('TEM CONVERSA JÁ MEU CHAPA')
 			return res.send({ error: 'já adicionado'})
 		}
 

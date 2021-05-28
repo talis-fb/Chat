@@ -12,6 +12,7 @@ db.start()
 const http = require('http').Server(app)
 const io = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
 
+// Static files
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist')) 
 app.set('views', path.join(__dirname,'..', 'dist'))
@@ -23,8 +24,29 @@ app.use(bodyParser.json())
 //Routes
 app.use(Routes)
 
+
+const save_name = (socket, next) => {
+	// socket.handshake = it's the headers with all dades of requesting of the websocket
+	const username = socket.handshake.auth.username
+	const pin = socket.handshake.auth.pin
+	socket.username = username
+	socket.pin = pin
+	next()
+}
+
+io.use(save_name)
 io.on('connection', socket => {
 	console.log(`New user: ${socket.id}`)
+
+	// set all sockets onlines in array 'users'
+	const users = []
+	for (let [id, socket] of io.of("/").sockets) {
+		users.push({
+			userID: id,
+			username: socket.username,
+			pin: socket.pin
+		})
+	}
 
 	socket.onAny((event, ...args) => {
 		console.log(event, args);
@@ -36,19 +58,19 @@ io.on('connection', socket => {
 		 */
 	})
 
-	socket.on('send_message', async ( sender )  =>{
-		console.log('RECEBBBIDADASDA')
+	socket.on('private message', async ( sender )  =>{
+		console.log('Mensagem enviada...')
 		console.log(sender)
 
 		let { message, token, destination } = sender
 
 		// valide token
-		const verify = jwt.verify(token, secret)
-		console.log(verify)
+		// const verify = jwt.verify(token, secret)
+		// console.log(verify)
 
 		// Get the pin of guy to sender the message with his name
 											// Change to PIn
-		const doc = await UsersDB.findOne({ name: sender.name }, 'pin')
+		const doc = await db.search_user_with_name( sender.name ) //UsersDB.findOne({ name: sender.name }, 'pin')
 		const pin_of_guy = doc.pin
 
 		// create chat

@@ -75,10 +75,16 @@ class App extends React.Component {
 
 	//Define a operação de adicionar contatos
 	defineFunctionSocket(){
-
 		socket.onAny((event, ...args) => {
 			console.log(event, args);
 		});
+
+		// Connect to socket of back-end sending your dades
+		const username =  this.state.dadesOfUser.name 
+		const pin = this.state.dadesOfUser.pin
+		const token = Auth.getToken()
+		socket.auth = { username, pin, token } // set attributes on propety 'auth', native of Socket.io
+		socket.connect() // Connect with the socket io
 
 		socket.on('newContact', contact => {
 			if ( contact.error ) return this.show_an_error(contact.error)
@@ -158,7 +164,7 @@ class App extends React.Component {
 		console.log('Mensagem ')
 		console.log(contact)
 
-		socket.emit('send_message', { 
+		socket.emit('private message', { 
 			message: msg,
 			destination: contact.cod,
 			pin: contact.pin,
