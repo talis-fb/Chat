@@ -123,27 +123,28 @@ Router
 			return res.send({ error: err })
 		}
 
-		const conversations = doc.conversations
-		return
+		const conversations = doc.conversations // return all contacts the user requesting have
 
 		let dades = []
 		for(let c in conversations){
 			let messages_found
 			let user_found
 			try {
-				user_found = await db.search_user_with_pin( conversations[c].contact ) // UsersDB.findOne({ pin: conversations[c].contact }, 'name pin')
-				messages_found = await db.return_messages( conversations[c].cod ) //MessagesDB.findOne({ pin: conversations[c].cod }, 'messages')
+				user_found = await db.search_user_with_pin( conversations[c].contact )
+				messages_found = await db.return_messages( conversations[c].cod ) 
 				// messages = (messages_found) ? messages_found.messages : null
 			} catch(err){
 				console.log(err)
 				messages_found = []
 			}
+			console.log('MSGS')
+			console.log(messages_found)
 
 			dades[c] = { 
-				// name: user_found.name, 
-				pin: user_found.contact,
+				name: user_found.name, 
+				pin: user_found.pin,
 				cod: conversations[c].cod, 
-				msgs: [...messages_found] // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
+				msgs: messages_found // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
 			}
 		}
 
@@ -164,7 +165,7 @@ Router
 			return res.send({ error: 'PIN Invalido' })
 		}
 
-		const user_found = await db.search_user_with_pin( pin_to_get ) //UsersDB.findOne({ pin: pin_to_get }, 'name pin conversations')
+		const user_found = await db.search_user_with_pin( pin_to_get ) 
 		if( !user_found ){
 			return res.send({ error: 'contato não encontrado' })
 		}
@@ -174,10 +175,18 @@ Router
 			return res.send({ error: 'já adicionado'})
 		}
 
+		// CRIAR O chat e ja adicioanar o contato 
+		// const doc1 = await db.add_new_contact( pin_user_requesting, pin_to_get )
+		// const doc2 = await db.add_new_contact( pin_to_get, pin_user_requesting ) 
+		// const cod_conv = await db.new_conversation( [ pin_user_requesting, pin_to_get ], "first" )
+		const cod_conv = await db.create_new_chat([ pin_user_requesting, pin_to_get ], "first")
+
+
 		//SENDING BACK for the socket
 		const contact = {
 			name: user_found.name,
 			pin: user_found.pin,
+			cod: cod_conv,
 			msgs: []
 		}
 		return res.send(contact)

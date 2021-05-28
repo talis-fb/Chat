@@ -15,7 +15,8 @@ const check_db = {
 		return user_found
 	},
 	async return_messages(pin_of_chat){
-		MessagesDB.findOne({ pin: pin_of_chat}, 'messages')
+		const messages_found =  await MessagesDB.findOne({ cod: pin_of_chat}, 'messages')
+		return messages_found.messages || []
 	}
 }
 
@@ -36,11 +37,12 @@ const manage_users_db = {
 		})
 		const data = await newUser.save()
 	},
-	async add_new_contact ( user_adding, who_add ){
+	async add_new_contact ( user_adding, who_add, cod ){
 		const doc = await UsersDB.updateOne( { pin: user_adding }, {
 			$push: { //Insert a new item in array conversations of user
 				conversations: {
 					contact: who_add,
+					cod: cod
 				}	
 			}
 		})
@@ -50,20 +52,25 @@ const manage_users_db = {
 
 const manage_chat_db = {
 	async create_new_chat (chat, first_message){
-		const { pin_1, pin_2 } = chat
+		const [ pin_1, pin_2 ] = chat
+		// pin_1 -> Who send
+		// pin_2 -> who receive
 
 		// await UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
 		const user_found = await check_db.search_user_with_pin(pin_2) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
 		if( !user_found ){
 			return { error: 'contato não encontrado' }
 		}
+		
+		//Creation of code the new conversation
+		const codeOfConv = Math.random().toString(36).substring(9);
 
 		// Set the new conversation on database 'messages'
-		let message = this.new_conversation( [pin_1,pin_2], first_message )
+		let message = this.new_conversation( [pin_1,pin_2], first_message, codeOfConv )
 
 		// UPDATE the conversation on database of both users
-		const user1 = manage_users_db.add_new_contact( pin_1, pin2 )
-		const user2 = manage_users_db.add_new_contact( pin_2, pin1 )
+		const user1 = manage_users_db.add_new_contact( pin_1, pin_2, codeOfConv )
+		const user2 = manage_users_db.add_new_contact( pin_2, pin_1, codeOfConv )
 
 		return codeOfConv // return the code of chat made
 	},
@@ -83,11 +90,11 @@ const manage_chat_db = {
 	},
 	
 	// Edit MessagesDB
-	async new_conversation ( members, first_message  ){
+	async new_conversation ( members, first_message, cod  ){
 		const [ pin_1, pin_2 ] = members
 
 		//Creation of code the new conversation
-		const codeOfConv = Math.random().toString(36).substring(9);
+		const codeOfConv = cod || Math.random().toString(36).substring(9);
 
 		const message = new MessagesDB({
 			members: [ pin_1, pin_2 ],
@@ -95,6 +102,7 @@ const manage_chat_db = {
 			messages: [{ from: pin_1, body: first_message }]	
 		})
 		const res = await message.save()
+		return codeOfConv
 	}
 }
 
