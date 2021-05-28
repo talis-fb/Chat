@@ -70,7 +70,8 @@ const manage_chat_db = {
 
 	async new_message ( sender, destination, message ){
 		// Send message
-		let new_message = await MessagesDB.updateOne( { cod: destination }, {
+		// let new_message = await MessagesDB.updateOne( { cod: destination }, {
+		let new_message = await MessagesDB.findOneAndUpdate( { cod: destination }, {
 			$push: { //Insert a new item in array conversations of user
 				messages: {
 					from: sender,
@@ -78,6 +79,7 @@ const manage_chat_db = {
 				}	
 			}
 		})
+		return new_message
 	},
 	
 	// Edit MessagesDB

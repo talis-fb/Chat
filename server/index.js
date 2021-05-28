@@ -12,6 +12,9 @@ db.start()
 const http = require('http').Server(app)
 const io = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
 
+//jwt
+const jwt = require('./auth')
+
 // Static files
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist')) 
@@ -24,13 +27,24 @@ app.use(bodyParser.json())
 //Routes
 app.use(Routes)
 
-
-const save_name = (socket, next) => {
+const save_name = async (socket, next) => {
 	// socket.handshake = it's the headers with all dades of requesting of the websocket
-	const username = socket.handshake.auth.username
-	const pin = socket.handshake.auth.pin
-	socket.username = username
-	socket.pin = pin
+	const token = socket.handshake.auth.token
+
+	let verify
+	try {
+		verify = await jwt.verify_jwt(token)
+	} catch(err){
+		console.log(err)
+		return
+	}
+
+	socket.username = verify.name
+	socket.pin = verify.pin
+
+	// Enter in room of his pin
+	socket.join(socket.pin)
+
 	next()
 }
 
@@ -47,6 +61,8 @@ io.on('connection', socket => {
 			pin: socket.pin
 		})
 	}
+	console.log('\nusuarios ativos...')
+	console.log(users)
 
 	socket.onAny((event, ...args) => {
 		console.log(event, args);
@@ -62,40 +78,29 @@ io.on('connection', socket => {
 		console.log('Mensagem enviada...')
 		console.log(sender)
 
-		let { message, token, destination } = sender
+		let { message, to, token } = sender
 
-		// valide token
-		// const verify = jwt.verify(token, secret)
-		// console.log(verify)
+		if ( !to ) return
 
-		// Get the pin of guy to sender the message with his name
-											// Change to PIn
-		const doc = await db.search_user_with_name( sender.name ) //UsersDB.findOne({ name: sender.name }, 'pin')
-		const pin_of_guy = doc.pin
+		const user = jwt.verify_jwt(token)
+		console.log('token')
+		console.log(user)
 
-		// create chat
-		if ( !destination ){
-			console.log('AQUI CRIA A CONVERSA')
-
-			// create a new conversation and return the code of it
-			destination = db.create_new_chat({ 
-					pin_1: verify.pin,
-					pin_2: pin_of_guy 
-			}, message)
-
-			// ----------------------------------------------
-			socket.emit( 'new_chat', { name:sender.name, cod: destination, type: 1, msgs: [] } )
-			socket.emit( 'new_message', { cod: destination, msgs: sender.message })
-			return
+		try{
+			const update = await db.new_message( user.pin, to, message )
+			console.log('acho?:')
+			console.log(!!update)
+			if( update ){
+				for( i of update.members ){
+					io.to(i).emit("private message", { cod: to, contect: message, from: user.pin } )
+				}
+			}
+		}catch (err){
+			console.log('Erro')
+			console.log(err)
 		}
 
-		// Send message
-
-		let new_message = db.new_message( verify.pin, destination, sender.message   )
-
-		console.log('MENSAGEM SETADA')
-
-		socket.emit( 'new_message', { cod: destination, msg: sender.message })
+		return
 	})
 
 	socket.on('disconnect', () => {

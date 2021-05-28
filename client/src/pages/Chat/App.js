@@ -95,6 +95,21 @@ class App extends React.Component {
 			const { msgs, cod, type, name } = chat
 			this.save_contact_on_list(chat)
 		})
+
+		socket.on('private message', msg => {
+			const {cod, contect, from } = msg
+
+			const sender =  from === this.state.dadesOfUser.pin ? 1 : 2
+			let state = [ ...this.state.contacts ]
+			for( let i in this.state.contacts ){
+				if( this.state.contacts[i].cod === cod){
+					console.log("Achou")
+					console.log(this.state.contacts[i])
+					state[i].msgs.push({ sender: sender , text: contect })
+				}
+			}
+			this.setState({ contacts: state })
+		})
 	}
 
 	updateContactList(){
@@ -166,8 +181,7 @@ class App extends React.Component {
 
 		socket.emit('private message', { 
 			message: msg,
-			destination: contact.cod,
-			pin: contact.pin,
+			to: contact.cod,
 			token: Auth.getToken()
 		})
 
