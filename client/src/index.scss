@@ -4,9 +4,17 @@ body {
   background-color: antiquewhite;
 }
 
-$color-danger: #ed4245 !global;
+$color-danger: #ed4245;
 $color-text: #ffffff;
+$color-text-secundary: #777777;
+
 $color-primary-dark: #36393f;
 $color-primary-darker: #2f3136;
 $color-primary-bold: #202225;
 
+$color-background-chat: #36393e;
+$color-background-global-chat: #2e3136;
+$color-mark-contact: #7289db;
+$color-add-contact: #7289da;
+
+$height-header: 3rem;

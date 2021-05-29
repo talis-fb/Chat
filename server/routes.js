@@ -179,7 +179,7 @@ Router
 		// const doc1 = await db.add_new_contact( pin_user_requesting, pin_to_get )
 		// const doc2 = await db.add_new_contact( pin_to_get, pin_user_requesting ) 
 		// const cod_conv = await db.new_conversation( [ pin_user_requesting, pin_to_get ], "first" )
-		const cod_conv = await db.create_new_chat([ pin_user_requesting, pin_to_get ], "first")
+		const cod_conv = await db.create_new_chat([ pin_user_requesting, pin_to_get ], "")
 
 
 		//SENDING BACK for the socket

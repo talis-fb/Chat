@@ -5,6 +5,7 @@ import ButtonAddContact from './Components/Space_Contacts/ButtonAddContact/Butto
 import Contacts from './Components/Space_Contacts/Contacts/Contacts'
 
 // Space Messages Components
+import HeaderMessages from './Components/Space_Messages/HeaderMessages/HeaderMessages'
 import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/SpaceMessageEmpty'
 import Messages from './Components/Space_Messages/Messages/Messages'
 import TextToSend from './Components/Space_Messages/TextToSend/TextToSend'
@@ -28,7 +29,7 @@ class App extends React.Component {
 				name: Auth.getCurrentUser().name,
 				pin: Auth.getCurrentUser().pin
 			},
-			conversationToShow: 1, // It's a number, of the index of conversation wanted. Start with the screen of Welcome
+			conversationToShow: 0, // It's a number, of the index of conversation wanted. Start with the screen of Welcome
 			errors: [],
 			contacts: [
 				{ 
@@ -36,6 +37,7 @@ class App extends React.Component {
 					// A element with 'screen:true' in this array will 
 					// not render messages and just render the element 
 					// and the key 'element'
+					name: "Welcome",
 					screen: true,
 					element: <SpaceMessageEmpty />
 				},
@@ -194,27 +196,27 @@ class App extends React.Component {
 
 		console.log(this.state)
 
+		//<div className="title">
+		//<a className="logout" href="/" onClick={this.logout}>Chat-oTuVisse</a>
+		//</div>
+
+
 		return (
 			<div className="App">
-				<div className="title">
-					<a className="logout" href="/" onClick={this.logout}>Chat-oTuVisse</a>
-				</div>
+				<nav className="space-of-contacts">
+					<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
+					<Contacts contacts={this.state.contacts} click={this.openAConversation} />
+					<div className="options">
+						{this.state.errors.map( i => i )}
+						<ButtonAddContact  addContact={this.addContact} />
+					</div>
+				</nav>
 
-				<div className="chat">
-					<nav className="space-of-contacts">
-						<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
-						<Contacts contacts={this.state.contacts} click={this.openAConversation} />
-						<div className="options">
-							{this.state.errors.map( i => i )}
-							<ButtonAddContact  addContact={this.addContact} />
-						</div>
-					</nav>
-
-					<nav className="space-of-messages">
-						<Messages chat={this.state.contacts[conversationToShow]} /> 
-						<TextToSend  submit={this.submit} />
-					</nav>
-				</div>
+				<nav className="space-of-messages">
+					<HeaderMessages title={ this.state.contacts[conversationToShow].name } />
+					<Messages chat={this.state.contacts[conversationToShow]} /> 
+					<TextToSend  submit={this.submit} />
+				</nav>
 			</div>
 		);
 	}
