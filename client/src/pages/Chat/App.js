@@ -65,7 +65,7 @@ class App extends React.Component {
 		this.defineFunctionSocket()
 		this.updateContactList()
 
-		this.submit = this.submit.bind(this)
+		this.send_message = this.send_message.bind(this)
 		this.openAConversation = this.openAConversation.bind(this)
 		this.addContact = this.addContact.bind(this)
 	}
@@ -123,7 +123,7 @@ class App extends React.Component {
 		})
 			.then( res => res.json())
 			.then( res => {
-				if ( res.error ) return this.logout()
+				if ( res.error ) return this.show_an_error(res.error)
 				console.log(res)
 				res.map( i => this.save_contact_on_list(i))
 			})
@@ -174,7 +174,7 @@ class App extends React.Component {
 		window.location.reload()
 	}
 
-	submit(msg){
+	send_message(msg){
 		const c =  this.state.conversationToShow 
 		const contact = this.state.contacts[c]
 
@@ -196,15 +196,14 @@ class App extends React.Component {
 
 		console.log(this.state)
 
-		//<div className="title">
-		//<a className="logout" href="/" onClick={this.logout}>Chat-oTuVisse</a>
-		//</div>
-
-
 		return (
 			<div className="App">
-				<nav className="space-of-contacts">
+				<header className="all">
 					<Profile name={this.state.dadesOfUser.name} pin={this.state.dadesOfUser.pin} />
+					<HeaderMessages title={ this.state.contacts[conversationToShow].name } />
+				</header>
+
+				<nav className="space-of-contacts">
 					<Contacts contacts={this.state.contacts} click={this.openAConversation} />
 					<div className="options">
 						{this.state.errors.map( i => i )}
@@ -213,9 +212,8 @@ class App extends React.Component {
 				</nav>
 
 				<nav className="space-of-messages">
-					<HeaderMessages title={ this.state.contacts[conversationToShow].name } />
 					<Messages chat={this.state.contacts[conversationToShow]} /> 
-					<TextToSend  submit={this.submit} />
+					<TextToSend send_message={this.send_message} />
 				</nav>
 			</div>
 		);

@@ -1,18 +1,14 @@
 @import '../../../../../index';
 
-header.chat{
+div.chat{
 	display: flex;
 	justify-content: space-between;
 	padding: 0.3rem;
 	background-color: $color-primary-dark;
-	height: $height-header;
-
-	box-sizing: border-box;
-	box-shadow: 0px 1px 3px black;
-	z-index:1;
 
 	.content{
 		display: flex;
+		align-items: center;
 
 		h2 {
 			color: $color-text-secundary;
@@ -20,5 +16,10 @@ header.chat{
 		h3 {
 			color: $color-text;
 		}
+	}
+
+	.options {
+		display: flex;
+		align-items: center;
 	}
 }

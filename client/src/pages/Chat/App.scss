@@ -16,11 +16,30 @@ body {
 	height: 100vh;
 
 	display: grid;
+	grid-template-rows: $height-header auto;
 	grid-template-columns: 1fr 3fr;
+	grid-template-areas: 
+	"header header header header"
+	"contacts messages messages messages";
+
+	header.all{
+		grid-area: header;
+		display: grid;
+		grid-template-columns: 1fr 3fr;
+		grid-template-rows: auto ;
+
+		box-sizing: border-box;
+		box-shadow: 0px 1px 3px black;
+		z-index:1;
+
+	}
 
 	.space-of-contacts{
+		grid-area: contacts;
 		position: relative;
 		background-color: $color-primary-darker;
+
+		align-self: stretch;
 
 		.options {
 			position: absolute;
@@ -32,6 +51,7 @@ body {
 		}
 	}
 	.space-of-messages {
+		grid-area: messages;
 		background-color: $color-primary-dark;
 		width: 100%;
 		height: 100%;
