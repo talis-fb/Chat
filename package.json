@@ -21,6 +21,7 @@
   "homepage": "https://github.com/talis-fb/Chat#readme",
   "dependencies": {
     "@popperjs/core": "^2.9.2",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "bootstrap": "^5.0.0-beta3",
     "ejs": "^3.1.5",

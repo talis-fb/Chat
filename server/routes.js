@@ -1,6 +1,9 @@
 const express = require('express')
 var Router = express.Router()
 
+const bcrypt = require('bcrypt')
+const saltRounds = 10
+
 const { generateAccessToken, verify_jwt } = require('./auth')
 const db = require('./database')
 
@@ -15,6 +18,8 @@ Router
 			console.log('- Processo de REGISTRO:')
 			// Extract dades of request
 			const { nickname, password } = req.body
+
+			const hashed_password =  await bcrypt.hash(password, saltRounds)
 
 			// print dades
 			process.stdout.write(`\t [ok] Dados recebidos:` ) // Um console.log que não quebra linha
@@ -34,7 +39,7 @@ Router
 			db.create_new_user({
 				pin: newPin,
 				name: nickname,
-				password: password,
+				password: hashed_password,
 				conversation: []
 			})
 
@@ -80,7 +85,8 @@ Router
 			process.stdout.write(`\t [ok] Usuario Encontrado: ` ) 
 			console.log(UserLogging)
 
-			if ( UserLogging.password !== password ){
+			const password_correct =  await bcrypt.compare( password, UserLogging.password )
+			if ( !password_correct ){
 				console.log(`\t [x] SENHA ERRADA`)
 				return res.send({ error: 'senha errada' })
 			}
