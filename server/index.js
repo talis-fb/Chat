@@ -74,21 +74,21 @@ io.on('connection', socket => {
 		console.log('Mensagem enviada...')
 		console.log(sender)
 
-		let { message, to, token } = sender
+		let { message, destination, token } = sender
 
-		if ( !to ) return
+		if ( !destination ) return
 
 		const user = jwt.verify_jwt(token)
 		console.log('token')
 		console.log(user)
 
 		try{
-			const update = await db.new_message( user.pin, to, message )
+			const updated = await db.new_message( user.pin, destination, message )
 			console.log('acho?:')
-			console.log(!!update)
-			if( update ){
-				for( i of update.members ){
-					io.to(i).emit("private message", { cod: to, body: message, from: user.pin } )
+			console.log(!!updated)
+			if( updated ){
+				for( i of updated.members ){
+					io.to(i).emit("private message", { cod: destination, body: message, from: user.pin } )
 				}
 			}
 		}catch (err){

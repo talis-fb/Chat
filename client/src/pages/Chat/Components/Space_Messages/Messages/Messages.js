@@ -56,7 +56,9 @@ export default class Messages extends React.Component{
         //If it doesn't received messages in props, the 'box_of_messages' keeps null
         return(
             <div className="messages-chat">
+				<div className="messages-block">
 				{ hasMessages ? box_of_messages : withoutMessages }
+				</div>
             </div>
         )
     }

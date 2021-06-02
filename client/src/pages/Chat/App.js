@@ -183,7 +183,7 @@ class App extends React.Component {
 
 		socket.emit('private message', { 
 			message: msg,
-			to: contact.cod,
+			destination: contact.cod,
 			token: Auth.getToken()
 		})
 
