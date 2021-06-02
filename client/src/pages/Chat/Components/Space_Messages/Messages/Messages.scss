@@ -14,19 +14,19 @@
 
 		background-color: $color-primary-dark;
 
-		font-size: larger;
-
-		flex-grow: 1;
-
 		display: flex;
 		flex-direction: column;
+		flex-grow: 1;
 
 		overflow: auto;
 	}
 
     .box-msg {
+		width: 100%;
+		font-size: 30pt;
         padding: 10px;
         .msg-User{
+			max-width: 70%;
             border-radius: 10px;
             background-color: rgb(103, 145, 39);
             display: inline-block;
@@ -34,6 +34,7 @@
             float: right;
         }
         .msg-Friend{
+			max-width: 70%;
             border-radius: 10px;
             background-color: rgb(124, 148, 88);
             display: inline-block;

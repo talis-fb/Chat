@@ -1,62 +1,37 @@
-.space-for-button{
+@import '../../../../../index';
+
+
+.form{
+	text-align: center;
+	color: $color-text;
 	display: flex;
 	justify-content: center;
-	align-content: center;
-	position: relative;
-	button {
-		border: 0;
-		outline: none;
-		background-color: rgb(107, 107, 243);
-		font-family: 'Ubuntu';
-		font-weight: bolder;
-		font-size: large;
-		text-align: center;
-		border-radius: 10px;
 
-		border-bottom: solid 3.5px rgb(68, 68, 121);
-
-		height: 90%;
-		width: 90%;
-
-		&:hover {
-			transition: 0.1s;
-			background-color: rgb(137, 137, 247);
-			border-bottom: solid 3.5px rgb(79, 79, 122);
-		}
-
-		&:active {
-			border-bottom: none;
-		}
-	}
-
-}
-.space-pin{
-	padding: 0.3rem;
-	width: 100%;
-
-	div{
-		background-color: rgb(61, 61, 61);
-		padding: 20px;
-		height: 30px;
-		width: 80%;
-		border-radius: 10px;
-		margin: 0 auto;
+	div {
+		background-color: $color-primary-bold;
+		border-radius: 0.7rem; //25px;
+		border: 1px solid black;
 		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-family: 'Ubuntu';
+		justify-content: space-between;
 		input{
-			font-family: 'Ubuntu';
-			width: 30%;
-			background: none;
+			color: $color-text;
 			outline: none;
+			border: none;
+			background: none;
+			padding: 0.4rem;
+		}
+		button{
+			// width: 100%;
+			height: 100%;
+			background-color: $color-add-contact; //$color-mark-contact;
+			// border: 1px solid black;
+			border: none;
+			font-size: 15pt;
+			padding: 0.4rem;
+			// border-radius: 25px;
+			border-top-right-radius: 0.7rem;
+			border-bottom-right-radius: 0.7rem;
 		}
 	}
-
-	.enable{
-		display: block;
-	}
-	.disable{
-		display: none;
-	}
+	margin-bottom: 0.5rem;
 }

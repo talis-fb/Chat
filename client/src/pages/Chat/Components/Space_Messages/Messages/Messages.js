@@ -43,11 +43,10 @@ export default class Messages extends React.Component{
 
 		const messages = this.props.chat.msgs
 		const box_of_messages = messages.map( i => {
-			if ( i.from===pin ) {
-				return this.messageFromUser(i.body) 
-			} else {
-				return this.messageFromFriend(i.body)
-			}
+			if ( !i.body ) return null
+			if ( i.from===pin ) return this.messageFromUser(i.body) 
+
+			return this.messageFromFriend(i.body)
 		})
 
 		const withoutMessages = this.withoutMessages()
