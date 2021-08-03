@@ -1,18 +1,18 @@
 import React from 'react'
 
 // Space Contacts Components
-import ButtonAddContact from './Components/Space_Contacts/ButtonAddContact/ButtonAddContact'
-import Contacts from './Components/Space_Contacts/Contacts/Contacts'
+import ButtonAddContact from './Components/ButtonAddContact'
+import Contacts from './Components/Contacts/Contacts'
 
 // Space Messages Components
-import HeaderMessages from './Components/Space_Messages/HeaderMessages/HeaderMessages'
-import SpaceMessageEmpty from './Components/Space_Messages/SpaceMessageEmpty/SpaceMessageEmpty'
-import Messages from './Components/Space_Messages/Messages/Messages'
-import TextToSend from './Components/Space_Messages/TextToSend/TextToSend'
+import HeaderMessages from './Components/Messages/HeaderMessages'
+import SpaceMessageEmpty from './Components/Messages/SpaceMessageEmpty'
+import Messages from './Components/Messages/Messages'
+import TextToSend from './Components/Messages/TextToSend'
 
 import Auth from '../AuthService'
-import Profile from './Components/Profile/Profile'
-import ErrorLog from './Components/ErrorLog/ErrorLog'
+import Profile from './Components/Profile'
+import ErrorLog from './Components/ErrorLog'
 
 import './App.scss';
 

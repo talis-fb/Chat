@@ -1,7 +1,7 @@
 import React from 'react'
 import './HeaderMessages.scss'
 
-import Auth from '../../../../AuthService'
+import Auth from '../../../AuthService'
 
 function Header(props){
 	const logout = () => {

@@ -1,3 +1,12 @@
+@import '../../../../index';
+
+.contacts{
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+	background-color: $color-primary-darker;
+}
+
 .block-chat {
     display: flex;
     width: 100%;
@@ -14,3 +23,4 @@
         background-color: rgb(156, 154, 154);
     }
 }
+

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Auth from '../../../../AuthService'
+import Auth from '../../../AuthService'
 import './Messages.scss';
 
 export default class Messages extends React.Component{
@@ -34,7 +34,6 @@ export default class Messages extends React.Component{
 	}
 
     render(){
-
 		// If the chat has the props 'screen' means it is a screen to show
 		// and not a chat. So, it just return the element of that screen
 		if ( this.props.chat.screen ) return this.props.chat.element

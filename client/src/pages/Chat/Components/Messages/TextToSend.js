@@ -1,5 +1,5 @@
 import React from 'react'
-import Auth from '../../../../AuthService'
+import Auth from '../../../AuthService'
 
 import './TextToSend.scss'
 
