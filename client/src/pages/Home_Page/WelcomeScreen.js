@@ -89,119 +89,58 @@ export default class WelcomeScreen extends React.Component{
 	returnOption(){
 		if(this.state.option){
 			return (
-				<React.Fragment>
+				<>
+					<h2>Username</h2>
+					<input type="text" />
 
-					<InputGroup className="mb-3 name-log">
-						<InputGroup.Prepend>
-							<InputGroup.Text className="icone-botao" id="basic-addon1"> <img src={iconUser} /> </InputGroup.Text>
-						</InputGroup.Prepend>
-						<FormControl
-							onChange={this.handleInputChange}
-							name="nickname" 
-							type="text"
-							placeholder="Username"
-							aria-label="Username"
-							aria-describedby="basic-addon1"
-						/>
-					</InputGroup>
+					<h2>Senha</h2>
+					<input type="password" onChange={this.handleInputChange}/>
 
-					<InputGroup className="mb-3 name-log">
-						<InputGroup.Prepend>
-							<InputGroup.Text className="icone-botao" id="basic-addon1"> <img src={iconPassword} /> </InputGroup.Text>
-
-						</InputGroup.Prepend>
-						<FormControl
-							onChange={this.handleInputChange}
-							name="password" 
-							type="password"
-							placeholder="Senha"
-							aria-label="Password"
-							aria-describedby="basic-addon1"
-						/>
-					</InputGroup>
-
-
-					<InputGroup className="mb-3 name-log">
-						<InputGroup.Prepend>
-							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconPassword} /></InputGroup.Text>
-						</InputGroup.Prepend>
-						<FormControl
-							onChange={this.handleInputChange}
-							name="passwordConfirm" 
-							type="password"
-							placeholder="Repita a senha"
-							aria-label="Username"
-							aria-describedby="basic-addon1"
-						/>
-					</InputGroup>
-
+					<h2>Senha novamente...</h2>
+					<input type="password" onChange={this.handleInputChange}/>
 					{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
-
-
-				</React.Fragment>
+				</>
 			)
 		} else {
 			return (
-				<React.Fragment>
+				<>
+					<h2>Username</h2>
+					<input type="text" />
 
-					<InputGroup className="mb-3 name-log">
-						<InputGroup.Prepend>
-							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconUser} /></InputGroup.Text>
-						</InputGroup.Prepend>
-						<FormControl
-							onChange={this.handleInputChange}
-							name="nickname" 
-							type="text"
-							placeholder="Username"
-							aria-label="Username"
-							aria-describedby="basic-addon1"
-						/>
-					</InputGroup>
-
-
-					<InputGroup className="mb-3 name-log">
-						<InputGroup.Prepend>
-							<InputGroup.Text className="icone-botao" id="basic-addon1"><img height="100%" src={iconPassword} /></InputGroup.Text>
-						</InputGroup.Prepend>
-						<FormControl
-							onChange={this.handleInputChange}
-							name="password" 
-							type="password"
-							placeholder="Password"
-							aria-label="Password"
-							aria-describedby="basic-addon1"
-						/>
-					</InputGroup>
-
+					<h2>Senha</h2>
+					<input type="password" onChange={this.handleInputChange}/>
 					{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
-
-				</React.Fragment>
+				</>
 			)
 		}
 	}
 
 
 	render(){
-
+		const cat1 = "https://media.tenor.com/images/3705aad154b22965c6723ac41e56415c/tenor.gif"
+		const cat2 = "https://media.tenor.com/images/222c6f2036f7962461641aef91d56677/tenor.gif"
 		return(
 			<div className="WelcomeScreen">
 				<main className="main">
-					<header className="mb-3">Chat-uTuVisse</header>
+					<section className="inputs">
+						<header className="mb-3">Chat-uTuVisse</header>
 
-					<form className="forms mb-3">
-						{this.returnOption()}
-						<Button className="button-confirm" onClick={(event) => this.requestFromServer(event)} variant="success">CHAT</Button>
-					</form>
+						<form>
+							{this.returnOption()}
+							<Button className="button-confirm" onClick={(event) => this.requestFromServer(event)} variant="success">CHAT</Button>
+						</form>
 
-					<div className="options">
-						<Button onClick={() => this.changeOption(true) } active={this.state.option}  variant="outline-warning" className="mb-3">Cadastro</Button>
-						<Button  onClick={() => this.changeOption(false) } active={!this.state.option} variant="outline-warning" className="mb-3">Login</Button>
-					</div>
+						<div className="options">
+							<Button onClick={() => this.changeOption(true) } active={this.state.option}  variant="outline-warning" className="mb-3">Cadastro</Button>
+							<Button  onClick={() => this.changeOption(false) } active={!this.state.option} variant="outline-warning" className="mb-3">Login</Button>
+						</div>
+					</section>
+
+					<section className="art">
+						<img src={cat1} />
+					</section>
 				</main>
 
-				<section className="art">
-					<img src={Svg_2} />
-				</section>
 			</div>
 		)
 	}
