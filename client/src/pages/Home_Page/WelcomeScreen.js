@@ -91,13 +91,13 @@ export default class WelcomeScreen extends React.Component{
 			return (
 				<>
 					<h2>Username</h2>
-					<input type="text" />
+					<input type="text" name="nickname" onChange={this.handleInputChange}/>
 
 					<h2>Senha</h2>
-					<input type="password" onChange={this.handleInputChange}/>
+					<input type="password" name="password" onChange={this.handleInputChange}/>
 
 					<h2>Senha novamente...</h2>
-					<input type="password" onChange={this.handleInputChange}/>
+					<input type="password" name="passwordConfirm" onChange={this.handleInputChange}/>
 					{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
 				</>
 			)
@@ -105,10 +105,10 @@ export default class WelcomeScreen extends React.Component{
 			return (
 				<>
 					<h2>Username</h2>
-					<input type="text" />
+					<input type="text" name="nickname" onChange={this.handleInputChange}/>
 
 					<h2>Senha</h2>
-					<input type="password" onChange={this.handleInputChange}/>
+					<input type="password" name="password" onChange={this.handleInputChange}/>
 					{ !!this.state.alert_error ? <Alert className="alert_error" variant="danger">{this.state.alert_error}</Alert> : '' }
 				</>
 			)
@@ -117,6 +117,7 @@ export default class WelcomeScreen extends React.Component{
 
 
 	render(){
+		// gifs for stay on right side of container
 		const cat1 = "https://media.tenor.com/images/3705aad154b22965c6723ac41e56415c/tenor.gif"
 		const cat2 = "https://media.tenor.com/images/222c6f2036f7962461641aef91d56677/tenor.gif"
 		return(
