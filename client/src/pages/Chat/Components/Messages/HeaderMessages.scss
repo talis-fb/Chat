@@ -1,25 +1,25 @@
 @import '../../../../index';
 
 div.chat{
-	display: flex;
-	justify-content: space-between;
-	padding: 0.3rem;
-	background-color: $color-primary-dark;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem;
+    background-color: $color-primary-dark;
 
-	.content{
-		display: flex;
-		align-items: center;
+    .content{
+        display: flex;
+        align-items: center;
 
-		h2 {
-			color: $color-text-secundary;
-		}
-		h3 {
-			color: $color-text;
-		}
-	}
+        h2 {
+            color: $color-text-secundary;
+        }
+        h3 {
+            color: $color-text;
+        }
+    }
 
-	.options {
-		display: flex;
-		align-items: center;
-	}
+    .options {
+        display: flex;
+        align-items: center;
+    }
 }
