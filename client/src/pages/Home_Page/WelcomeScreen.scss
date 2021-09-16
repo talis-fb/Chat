@@ -4,76 +4,76 @@ $red: #cf2548;
 $blue: #2a5a9f;
 
 body {
-	background-color: $blue;
+    background-color: $blue;
 }
 
 .WelcomeScreen {
-	height: 100vh;
-	width: 100vw;
-	margin: 0 auto;
+    height: 100vh;
+    width: 100vw;
+    margin: 0 auto;
 
-	background-image: url("./assets/home_background.png");
-	background-position: center; // Center the image 
-	background-repeat: no-repeat; // Do not repeat the image 
-	background-size: cover; // Resize the background image to cover the entire container 
+    background-image: url("./assets/home_background.png");
+    background-position: center; // Center the image 
+    background-repeat: no-repeat; // Do not repeat the image 
+    background-size: cover; // Resize the background image to cover the entire container 
 
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-	.main{
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background-color: $color-primary-dark;
-		border-radius: 10px;
+    .main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: $color-primary-dark;
+        border-radius: 10px;
 
-		min-width: 800px;
+        min-width: 800px;
 
-		.inputs {
-			width:50%;
-			display: block;
-			padding: 2rem;
-			color: white;
-			header {
-				font-size: 3rem;
-			}
+        .inputs {
+            width:50%;
+            display: block;
+            padding: 2rem;
+            color: white;
+            header {
+                font-size: 3rem;
+            }
 
-			.button-confirm{
-				width: 100%;
-				margin-bottom: 10px;
-			}
-			form {
-				h2 {
-					text-align: left;
-					color: $color-text-secundary;
-				}
-				& > input{
-					@include input-form; 
-					width: 100%;
-					height: 3rem;
-					margin-bottom: 1rem;
-					&:focus {
-						outline: $purple solid 2px;
-					}
-				}
-				.alert_error {
-					width: 95%;
-					height: 1rem;
-					display: flex;
-					align-items: center;
-				}
-			}
-			.options {
-				display: flex;
-				justify-content: center;
-			}
-		}
-		.art{
-			width:50%;
-			text-align: center;
-			margin:0 auto;
-		}
-	}
+            .button-confirm{
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            form {
+                h2 {
+                    text-align: left;
+                    color: $color-text-secundary;
+                }
+                & > input{
+                    @include input-form; 
+                    width: 100%;
+                    height: 3rem;
+                    margin-bottom: 1rem;
+                    &:focus {
+                        outline: $purple solid 2px;
+                    }
+                }
+                .alert_error {
+                    width: 95%;
+                    height: 1rem;
+                    display: flex;
+                    align-items: center;
+                }
+            }
+            .options {
+                display: flex;
+                justify-content: center;
+            }
+        }
+        .art{
+            width:50%;
+            text-align: center;
+            margin:0 auto;
+        }
+    }
 }
