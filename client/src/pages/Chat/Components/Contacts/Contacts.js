@@ -10,7 +10,7 @@ import Icon from '../../Assets/icon-profile.png'
 function BlockOfContact(props){
     // onClick function return the index of the contact in the array of App Component has the contacts
     return(
-        <div className="block-chat" onClick={ i => props.click(props.index)}>
+        <div className="block-chat" >
             <img src={Icon}  />
             <div>
                 <h2>{props.name}</h2>
@@ -21,9 +21,10 @@ function BlockOfContact(props){
 }
 
 export default function (props){
-    if ( !props.contacts.length ) return  <WithoutContacts /> 
+    // if ( !props.contacts.length ) return  <WithoutContacts /> 
+    const { name, msgs } = props.contact
 
-        const handleClick = props.click
+    return <BlockOfContact name={name} msg={msgs} />
 
     // Return an array with components of all contacts
     const handleContacts = ( contact, index ) => {
@@ -44,14 +45,9 @@ export default function (props){
             }
         }
 
-        return <BlockOfContact name={name} msg={message_to_display} click={handleClick} index={index}  />
+        return 
     }
-    const list_of_contacts = props.contacts.map(handleContacts)
+    // const list_of_contacts = props.contact.map(handleContacts)
 
-    return (
-        <div className="contacts">
-            { list_of_contacts }
-        </div>
-    )
 }
 
