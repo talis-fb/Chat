@@ -1,19 +1,21 @@
-const express = require('express')
+import express, { Request, Response } from 'express'
 var Router = express.Router()
 
-const bcrypt = require('bcrypt')
+import bcrypt from 'bcrypt'
 const saltRounds = 10
 
-const { generateAccessToken, verify_jwt } = require('./auth')
-const db = require('./database')
+import path from 'path'
+
+import { generateAccessToken, verify_jwt } from './auth'
+import db from './database'
 
 Router
-	.get('/', (req, res) => {
+	.get('/', (req:Request, res:Response) => {
 		res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
 		console.log(path.join( __dirname, '..', 'dist' , 'index.html'))
 	})
 
-	.post('/register', async (req, res) => {
+	.post('/register', async (req:Request, res:Response) => {
 		try{
 			console.log('- Processo de REGISTRO:')
 			// Extract dades of request
@@ -63,7 +65,7 @@ Router
 
 	})
 
-	.post('/login', async (req, res) => {
+	.post('/login', async (req:Request, res:Response) => {
 		try {
 			const { nickname, password } = req.body
 
@@ -74,7 +76,7 @@ Router
 			console.log( req.body)
 
 			// Get the User logging on database
-			const UserLogging = await db.search_user_with_name(nickname, 'password')
+			const UserLogging = <any>await db.search_user_with_name(nickname, 'password')
 
 			// If the user dont exist
 			if ( !UserLogging ){
@@ -112,7 +114,7 @@ Router
 
 	})
 
-	.post('/returnContacts', async (req, res) => {
+	.post('/returnContacts', async (req:Request, res:Response) => {
 		const { token } = req.body
 
 		console.log('- Retorno de contato: ')
@@ -162,7 +164,7 @@ Router
 		return res.send( dades)
 	})
 
-	.post('/addContact', async (req, res) => {
+	.post('/addContact', async (req:Request, res:Response) => {
 
 		const { pin_to_get, pin_user_requesting, name } = req.body
 
@@ -198,4 +200,4 @@ Router
 		return res.send(contact)
 	})
 
-module.exports = Router
+export default Router

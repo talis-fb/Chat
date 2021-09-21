@@ -1,19 +1,22 @@
-const express = require('express')
+import express from 'express'
 const app = express()
-const path = require('path')
-const bodyParser = require('body-parser')
-const Routes = require('./routes')
+
+import path from 'path'
+// import bodyParser from 'body-parser'
+import Routes from './routes'
 
 // Database
-const db = require('./database')
+import db from './database'
 db.start()
 
 // Socket.IO
+import { Socket } from 'socket.io'
+
 const http = require('http').Server(app)
 const io = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
 
 //jwt
-const jwt = require('./auth')
+import * as jwt from './auth'
 
 // Static files
 app.use(express.static(path.join( __dirname, '..','dist')))
@@ -21,15 +24,19 @@ console.log(path.join( __dirname, '..','dist'))
 app.set('views', path.join(__dirname,'..', 'dist'))
 
 //Configuration of Body-Parser
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+// app.use(bodyParser.urlencoded({extended: false}))
+// app.use(bodyParser.json())
+
+// Pode importar só isso ao inves do body-parser
+app.use(express.urlencoded({extended: true}));
+app.use(express.json()) // To parse the incoming requests with JSON payloads
 
 //Routes
 app.use(Routes)
 
-const save_name = async (socket, next) => {
-	// socket.handshake = it's the headers with all dades of requesting of the websocket
-	const token = socket.handshake.auth.token
+const save_name = async (socket:any, next:()=>void ) => {
+    // Era para socket a tipagem de 'Socket', mas n aceita adições
+	const token = <any>socket.handshake.auth.token
 
 	let verify
 	try {
@@ -39,36 +46,44 @@ const save_name = async (socket, next) => {
 		return
 	}
 
-	socket.username = verify.name
-	socket.pin = verify.pin
+	socket.handshake.auth.username = <any>verify.name
+	socket.handshake.auth.pin = <any>verify.pin
 
 	// Enter in room of his pin
-	socket.join(socket.pin)
+	socket.join(socket.handshake.auth.pin)
 
 	next()
 }
 
 io.use(save_name)
-io.on('connection', socket => {
+io.on('connection', ( socket:Socket ) => {
 	console.log(`New user: ${socket.id}`)
 
 	// set all sockets onlines in array 'users'
-	const users = []
+    interface User {
+        username: string,
+        userID: string,
+        pin: string
+    }
+	const users:Array<User> = []
+
 	for (let [id, socket] of io.of("/").sockets) {
 		users.push({
 			userID: id,
-			username: socket.username,
-			pin: socket.pin
+			username: socket.handshake.auth.username,
+			pin: socket.handshake.auth.pin
 		})
 	}
-	console.log('\nusuarios ativos...')
+
+	console.log('\n usuarios ativos...')
 	console.log(users)
 
-	socket.onAny((event, ...args) => {
-		console.log(event, args);
-	});
+    // Alerta de qualquer evento
+	socket.onAny((event, ...args) => console.log(event, args))
 
-	socket.on('first message', async ( pin_to_who, token_sender, message ) => { })
+	// socket.on('first message', async ( pin_to_who, token_sender, message ) => { })
+
+
 
 	socket.on('private message', async ( sender )  =>{
 		console.log('Mensagem enviada...')
@@ -87,7 +102,7 @@ io.on('connection', socket => {
 			console.log('acho?:')
 			console.log(!!updated)
 			if( updated ){
-				for( i of updated.members ){
+				for( let i of updated.members ){
 					io.to(i).emit("private message", { cod: destination, body: message, from: user.pin } )
 				}
 			}

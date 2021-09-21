@@ -1,20 +1,20 @@
-const mongoose = require('mongoose')
-const path = require('path')
+import mongoose from 'mongoose'
 
 // Models
-const MessagesDB = require('./models/Messages')
-const UsersDB = require('./models/Users')
+import MessagesDB from './models/Messages'
+import UsersDB from './models/Users'
 
 const check_db = {
-	async search_user_with_pin(pin){
+	async search_user_with_pin(pin:string){
 		const user_found = await UsersDB.findOne({ pin: pin }, 'name pin conversations')
 		return user_found
 	},
-	async search_user_with_name(name, dades_to_get){
-		const user_found = await UsersDB.findOne({ name: name }, `name pin conversations ${dades_to_get}`)
+	async search_user_with_name(name:string, ...dades_to_get:Array<string> ){
+        const dados_opcionais:string = String( dades_to_get ).replace(/,/g, ' ')
+		const user_found = await UsersDB.findOne({ name: name }, `name pin conversations ${dados_opcionais}`)
 		return user_found
 	},
-	async return_messages(pin_of_chat){
+	async return_messages(pin_of_chat:string){
 		const messages_found =  await MessagesDB.findOne({ cod: pin_of_chat}, 'messages')
 		return messages_found.messages || []
 	}
@@ -90,7 +90,7 @@ const manage_chat_db = {
 	},
 	
 	// Edit MessagesDB
-	async new_conversation ( members, first_message, cod  ){
+	async new_conversation ( members: [pin_1:string, pin_2:string], first_message:string, cod:string  ){
 		const [ pin_1, pin_2 ] = members
 
 		//Creation of code the new conversation
@@ -106,7 +106,7 @@ const manage_chat_db = {
 	}
 }
 
-module.exports = {
+export default {
 	start(){
 		mongoose.connect('mongodb://localhost:27017/chat', { useNewUrlParser: "true" })
 			.then( () => console.log('MONGODB conectado'))
