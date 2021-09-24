@@ -9,6 +9,8 @@ import path from 'path'
 import { generateAccessToken, verify_jwt } from './auth'
 import db from './database'
 
+import { Conversation, Mensagem, User, UserPin } from './types'
+
 Router
 	.get('/', (req:Request, res:Response) => {
 		res.sendFile(path.join( __dirname, '..', 'dist' , 'index.html'));
@@ -28,30 +30,28 @@ Router
 			console.log(req.body)
 
 			//If user already exist --> return error and finish function
-			const user_exist = await db.search_user_with_name(nickname) //UsersDB.findOne({ name: nickname})
+			const user_exist = !!(await db.search_user_with_name(nickname))
 			if( user_exist ) {
 				console.log(`\t [x] ERRO: Usuario já registrado\n`)
 				return res.status(400).send({ error: "User already exist" })
 			}
 
 			// Generate a new Pin random
-			const newPin = Math.random().toString(36).substring(9);
-			console.log(`\t [ok] NOVO PIN: `+newPin)
-
-			db.create_new_user({
-				pin: newPin,
+			const newPinUser:string = await db.create_new_user({
+                pin: "",
 				name: nickname,
 				password: hashed_password,
-				conversation: []
+				conversations: []
 			})
+			console.log(`\t [ok] NOVO PIN: `+newPinUser)
 
-			const token = generateAccessToken({ name: nickname, pin: newPin })
+			const token = generateAccessToken({ name: nickname, pin: newPinUser })
 
 			res.send({
 				registro: true,
 				user: {
 					name: nickname,
-					pin: newPin
+					pin: newPinUser
 				},
 				token: token
 			})
@@ -62,7 +62,6 @@ Router
 			console.log(err)
 			return res.status(400).send({ registro: false, error: err })
 		}
-
 	})
 
 	.post('/login', async (req:Request, res:Response) => {
@@ -76,7 +75,7 @@ Router
 			console.log( req.body)
 
 			// Get the User logging on database
-			const UserLogging = <any>await db.search_user_with_name(nickname, 'password')
+			const UserLogging = await db.search_user_with_name(nickname, 'password')
 
 			// If the user dont exist
 			if ( !UserLogging ){
@@ -119,8 +118,8 @@ Router
 
 		console.log('- Retorno de contato: ')
 
-		let verify
-		let user 
+		let verify:any
+		let doc:User
 		try {
 			verify = verify_jwt(token)
 			console.log(`\t [ok] TOKEN validado` ) 
@@ -131,67 +130,42 @@ Router
 			return res.send({ error: err })
 		}
 
-		const conversations = doc.conversations // return all contacts the user requesting have
+		const conversations:Array<string> = doc.conversations.map( ( i ):string => i.cod ) // return the array with all pins of conversations of user
+		let dades:Array<Mensagem> = []
 
-		let dades = []
-		for(let c in conversations){
-			let messages_found
-			let user_found
-			try {
-				user_found = await db.search_user_with_pin( conversations[c].contact )
-				messages_found = await db.return_messages( conversations[c].cod ) 
-				// messages = (messages_found) ? messages_found.messages : null
-			} catch(err){
-				console.log(err)
-				messages_found = []
-			}
-			console.log('MSGS')
-			console.log(messages_found)
-
-			dades[c] = { 
-				name: user_found.name, 
-				pin: user_found.pin,
-				cod: conversations[c].cod, 
-				msgs: messages_found // DESSE MODO ESTÁ INDO O ID DOS ARQUVISO NO DATABASE
-			}
-		}
-
+        const messages_found = await db.return_messages( conversations ) 
 
 		console.log(`\t [ok] TOKEN validado` ) 
 		console.log(`\t [ok] Dados enviados:` ) 
 		console.log(dades)
 
-		return res.send( dades)
+		return res.send( messages_found ) 
 	})
 
 	.post('/addContact', async (req:Request, res:Response) => {
 
-		const { pin_to_get, pin_user_requesting, name } = req.body
+		const { pin_to_get, pin_user_requesting } = req.body
 
 		//If the Pin received is the same of who is requesting
 		if( pin_to_get===pin_user_requesting ) {
 			return res.send({ error: 'PIN Invalido' })
 		}
 
-		const user_found = await db.search_user_with_pin( pin_to_get ) 
+		const user_found:any = await db.search_user_with_pin( pin_to_get ) 
 		if( !user_found ){
 			return res.send({ error: 'contato não encontrado' })
 		}
 
-		const isThereTalkBefore = user_found.conversations.filter( i => i.contact === pin_user_requesting )
+		const isThereTalkBefore = user_found.conversations.filter( (i:any) => i.contact === pin_user_requesting )
 		if ( isThereTalkBefore[0] ){
 			return res.send({ error: 'já adicionado'})
 		}
 
 		// CRIAR O chat e ja adicioanar o contato 
-		// const doc1 = await db.add_new_contact( pin_user_requesting, pin_to_get )
-		// const doc2 = await db.add_new_contact( pin_to_get, pin_user_requesting ) 
-		// const cod_conv = await db.new_conversation( [ pin_user_requesting, pin_to_get ], "first" )
-		const cod_conv = await db.create_new_chat([ pin_user_requesting, pin_to_get ], "")
-
+		const cod_conv = await db.new_message_db([ pin_user_requesting, pin_to_get ], "")
 
 		//SENDING BACK for the socket
-		const contact = {
+		const contact:any = {
 			name: user_found.name,
 			pin: user_found.pin,
 			cod: cod_conv,

@@ -9,20 +9,29 @@ import Routes from './routes'
 import db from './database'
 db.start()
 
-// Socket.IO
-import { Socket } from 'socket.io'
-
-const http = require('http').Server(app)
-const io = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
-
 //jwt
 import * as jwt from './auth'
+
+// Socket.IO
+import { Socket } from 'socket.io'
+const http = require('http').Server(app)
+const io:any = require('socket.io')( http, { cors: { origin: "http://localhost:8080"}} ) 
 
 // Static files
 app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist')) 
 app.set('views', path.join(__dirname,'..', 'dist'))
 
+// TESTE DA FUNÇÃO DE RETORNAR
+console.log("Ola mubndoooooooooooo")
+console.log(db.return_messages([ "m7g", "q13p", "3wh "]))
+
+async function aa(){
+    console.log("Ola mubndoooooooooooo")
+    console.log(await db.return_messages([ "m7g", "q13p", "3wh "]))
+}
+
+aa()
 //Configuration of Body-Parser
 // app.use(bodyParser.urlencoded({extended: false}))
 // app.use(bodyParser.json())
@@ -38,7 +47,7 @@ const save_name = async (socket:any, next:()=>void ) => {
     // Era para socket a tipagem de 'Socket', mas n aceita adições
 	const token = <any>socket.handshake.auth.token
 
-	let verify
+	let verify:any
 	try {
 		verify = await jwt.verify_jwt(token)
 	} catch(err){
@@ -98,12 +107,12 @@ io.on('connection', ( socket:Socket ) => {
 		console.log(user)
 
 		try{
-			const updated = await db.new_message( user.pin, destination, message )
+			const updated = <any>await db.send_message( "USERRR PIN", destination, message )
 			console.log('acho?:')
 			console.log(!!updated)
 			if( updated ){
 				for( let i of updated.members ){
-					io.to(i).emit("private message", { cod: destination, body: message, from: user.pin } )
+					io.to(<any>i).emit("private message", { cod: destination, body: message, from: 'user.pin' } )
 				}
 			}
 		}catch (err){

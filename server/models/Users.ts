@@ -1,13 +1,24 @@
-import mongoose from 'mongoose'
+import mongoose,{ Document } from 'mongoose'
 const Schema = mongoose.Schema;
 
-const oneConversation = new Schema({
+interface IOneConversation extends Document {
+    contact: string,
+    cod:string
+}
+
+const oneConversation = new Schema<IOneConversation>({
 	contact: String,
-	type: Number,
 	cod: String
 });
 
-const UsersSchema = new Schema({
+interface IUsersSchema extends Document {
+    pin: string,
+    name: string,
+    password: string,
+    conversations: IOneConversation[]
+}
+
+const UsersSchema = new Schema<IUsersSchema>({
 	pin: {
 		type: String,
 		required: true
@@ -24,4 +35,4 @@ const UsersSchema = new Schema({
 });
 
 
-export default mongoose.model('Users', UsersSchema);
+export default mongoose.model<IUsersSchema>('Users', UsersSchema);

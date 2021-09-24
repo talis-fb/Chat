@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken'
 const secret = 'kiuhfnuisdf9we8hafno9f8e8fuisdbFsd' // require('crypto').randomBytes(64).toString('hex')
 
-function generateAccessToken( username:{ name: string, pin:string } ){
-    return jwt.sign(username, secret);
+type UserRequest = { name:string, pin:string }
+async function generateAccessToken( user:UserRequest ){
+    return jwt.sign(user, secret);
 }
 
-function verify_jwt( token:string ){
+async function verify_jwt( token:string ){
     return jwt.verify(token, secret)
 }
 

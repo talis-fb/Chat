@@ -1,12 +1,21 @@
-import mongoose from 'mongoose'
+import mongoose,{ Document } from 'mongoose'
 const Schema = mongoose.Schema;
 
-const Message = new Schema({
-	from: String,
-	body: String
+interface IMessage extends Document {
+    from: string,
+    body: string
+}
+const Message = new Schema<IMessage>({
+	from: { type: String, required: true },
+	body: { type: String, required: true },
 })
 
-const MessagesSchema = new Schema({
+interface IMessageSchema extends Document {
+    cod: string,
+    members: string[],
+    messages: IMessage[]
+}
+const MessagesSchema = new Schema<IMessageSchema>({
 	cod: {
 		type: String,
 		require: true
@@ -15,4 +24,4 @@ const MessagesSchema = new Schema({
 	messages: [Message]
 });
 
-export default mongoose.model('Messages', MessagesSchema);
+export default mongoose.model<IMessageSchema>('Messages', MessagesSchema);

@@ -4,80 +4,89 @@ import mongoose from 'mongoose'
 import MessagesDB from './models/Messages'
 import UsersDB from './models/Users'
 
+import { UserPin, User, Conversation } from './types'
+
+const start = (): void => { 
+    mongoose.connect('mongodb://localhost:27017/chat', { useNewUrlParser: true }).then( () => console.log('MONGODB conectado')).catch( (err) => console.log('ERRO em conectar ao MONGO: '+err) )
+}
+
 const check_db = {
-	async search_user_with_pin(pin:string){
+	async search_user_with_pin(pin:UserPin) {
 		const user_found = await UsersDB.findOne({ pin: pin }, 'name pin conversations')
 		return user_found
 	},
-	async search_user_with_name(name:string, ...dades_to_get:Array<string> ){
+	async search_user_with_name(name:string, ...dades_to_get:string[] ){
         const dados_opcionais:string = String( dades_to_get ).replace(/,/g, ' ')
-		const user_found = await UsersDB.findOne({ name: name }, `name pin conversations ${dados_opcionais}`)
+		const user_found:any = await UsersDB.findOne({ name: name }, `name pin conversations ${dados_opcionais}`)
 		return user_found
 	},
-	async return_messages(pin_of_chat:string){
-		const messages_found =  await MessagesDB.findOne({ cod: pin_of_chat}, 'messages')
+	async return_messages(pin_of_chat:string[]){
+		const messages_found:any =  await MessagesDB.findOne({ cod: { $in: pin_of_chat }}, 'messages')
 		return messages_found.messages || []
 	}
 }
 
 const manage_users_db = {
 	// Edit Users info
-	async create_new_user (user){
-		const { pin, name, password } = user
+	async create_new_user (user:User){
+		const { name, password } = user
 
 		// Generate a new Pin random
 		const newPin = Math.random().toString(36).substring(9);
 
 		// Insert in database 
-		const newUser = new UsersDB({
-			pin: pin,
+		const newUser = new UsersDB(<User>{
+			pin: newPin,
 			name: name,
 			password: password,
-			conversation: []
+			conversations: []
 		})
 		const data = await newUser.save()
+
+        return newPin // Retorna o pin do usuario
 	},
-	async add_new_contact ( user_adding, who_add, cod ){
-		const doc = await UsersDB.updateOne( { pin: user_adding }, {
-			$push: { //Insert a new item in array conversations of user
-				conversations: {
-					contact: who_add,
-					cod: cod
-				}	
-			}
-		})
-		return doc
-	}
-}
 
-const manage_chat_db = {
-	async create_new_chat (chat, first_message){
-		const [ pin_1, pin_2 ] = chat
-		// pin_1 -> Who send
-		// pin_2 -> who receive
-
+	async set_new_contacts_in_users_db ( contact_for_add:UserPin, who_be_update:UserPin[], first_message:string){
 		// await UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
-		const user_found = await check_db.search_user_with_pin(pin_2) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
-		if( !user_found ){
-			return { error: 'contato não encontrado' }
-		}
+        for ( let i of who_be_update ){
+            const user_found = await check_db.search_user_with_pin(i) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
+            if( !user_found ){
+                // REFATORE --- se houver alguem q n existe, buga para geral
+                return { error: 'contato não encontrado' }
+            }
+        }
 		
-		//Creation of code the new conversation
-		const codeOfConv = Math.random().toString(36).substring(9);
+		// UPDATE the conversation on database of both users
+		const codeOfConv = Math.random().toString(36).substring(9); //Creation of code the new conversation
+        who_be_update.forEach( async (Pin) => {
+            const doc1 = await UsersDB.updateOne( { pin: Pin }, {
+                $push: { //Insert a new item in array conversations of user
+                    conversations: {
+                        contact: contact_for_add,
+                        cod: codeOfConv
+                    }	
+                }
+            })
+            const doc2 = await UsersDB.updateOne( { pin: contact_for_add }, {
+                $push: { //Insert a new item in array conversations of user
+                    conversations: {
+                        contact: Pin,
+                        cod: codeOfConv
+                    }	
+                }
+            })
+        })
 
 		// Set the new conversation on database 'messages'
-		let message = this.new_conversation( [pin_1,pin_2], first_message, codeOfConv )
-
-		// UPDATE the conversation on database of both users
-		const user1 = manage_users_db.add_new_contact( pin_1, pin_2, codeOfConv )
-		const user2 = manage_users_db.add_new_contact( pin_2, pin_1, codeOfConv )
+		let message = manage_chat_db.new_message_db( [contact_for_add, ...who_be_update], first_message, codeOfConv )
 
 		return codeOfConv // return the code of chat made
 	},
+}
 
-	async new_message ( sender, destination, message ){
-		// Send message
-		// let new_message = await MessagesDB.updateOne( { cod: destination }, {
+const manage_chat_db = {
+    // Send a message for a conversation (message_db) that already exist
+	async send_message ( sender:UserPin, destination:UserPin, message:string ){
 		let new_message = await MessagesDB.findOneAndUpdate( { cod: destination }, {
 			$push: { //Insert a new item in array conversations of user
 				messages: {
@@ -89,17 +98,15 @@ const manage_chat_db = {
 		return new_message
 	},
 	
-	// Edit MessagesDB
-	async new_conversation ( members: [pin_1:string, pin_2:string], first_message:string, cod:string  ){
-		const [ pin_1, pin_2 ] = members
-
+    // Send a message for a conversation (message_db) that doesn't exist or create a one
+	async new_message_db ( members: string[], first_message:string, cod?:string ){
 		//Creation of code the new conversation
 		const codeOfConv = cod || Math.random().toString(36).substring(9);
 
-		const message = new MessagesDB({
-			members: [ pin_1, pin_2 ],
+		const message = new MessagesDB(<Conversation>{
+			members: [...members],
 			cod: codeOfConv,
-			messages: [{ from: pin_1, body: first_message }]	
+			messages: [{ from: members[0], body: first_message }]	
 		})
 		const res = await message.save()
 		return codeOfConv
@@ -107,11 +114,7 @@ const manage_chat_db = {
 }
 
 export default {
-	start(){
-		mongoose.connect('mongodb://localhost:27017/chat', { useNewUrlParser: "true" })
-			.then( () => console.log('MONGODB conectado'))
-			.catch( (err) => console.log('ERRO em conectar ao MONGO: '+err) )
-	},
+    start,
 	...check_db,
 	...manage_chat_db,
 	...manage_users_db
