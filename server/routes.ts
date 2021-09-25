@@ -181,13 +181,16 @@ Router
         console.log(user_found.conversations)
 
         // Melhorar isoo <------------------------------------------------------------------------------------
-		const isThereTalkBefore = user_found.conversations.filter( (i:any) => i.contact === verify.pin )
-		if ( isThereTalkBefore[0] ){
+        const isThere = await db.is_there_chat_between([pin,verify.pin])
+
+		// const isThereTalkBefore = user_found.conversations.filter( (i:any) => i.contact === verify.pin )
+		if ( isThere[0] ){
 			return res.send({ error: 'já adicionado'})
 		}
 
 		// CRIAR O chat e ja adicioanar o contato 
-		const cod_conv = await db.new_message_db([ pin, verify.pin ], "")
+        const cod_conv = await db.set_new_contacts_in_users_db(pin, [verify.pin], "")
+		// const cod_conv = await db.new_message_db([ pin, verify.pin ], "")
 
 		//SENDING BACK for the socket
 		const contact:any = {
@@ -196,6 +199,7 @@ Router
 			cod: cod_conv,
 			msgs: []
 		}
+        console.log('addContact ok')
 		return res.send(contact)
 	})
 

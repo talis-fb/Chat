@@ -20,11 +20,15 @@ const check_db = {
 		const user_found:any = await UsersDB.findOne({ name: name }, `name pin conversations ${dados_opcionais}`)
 		return user_found
 	},
-	async return_messages(pin_of_chat:string[]){
-        const object_to_search = pin_of_chat.map( i => ({ cod: i }) )
+	async return_messages(pins_of_chats:string[]){
+        const object_to_search = pins_of_chats.map( i => ({ cod: i }) )
 		const messages_found:any =  await MessagesDB.find({ $or: [ ...object_to_search ]})
 		return messages_found
-	}
+	},
+    async is_there_chat_between(pins_of_chats:string[]){
+        const a = await UsersDB.find({ $and: [ {pin: pins_of_chats[0]}, {"conversations.contact":pins_of_chats[1]} ] })
+        return a
+    }
 }
 
 const manage_users_db = {
@@ -53,7 +57,7 @@ const manage_users_db = {
         return newPin // Retorna o pin do usuario
 	},
 
-	async set_new_contacts_in_users_db ( contact_for_add:UserPin, who_be_update:UserPin[], first_message:string){
+	async set_new_contacts_in_users_db ( contact_for_add:UserPin, who_be_update:UserPin[], first_message:string, cod?:string){
 		// await UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
         for ( let i of who_be_update ){
             const user_found = await check_db.search_user_with_pin(i) //UsersDB.findOne({ pin: pin_2 }, 'name pin conversations')
@@ -63,8 +67,8 @@ const manage_users_db = {
             }
         }
 		
-		// UPDATE the conversation on database of both users
-		const codeOfConv = Math.random().toString(36).substring(9); //Creation of code the new conversation
+        // UPDATE the conversation on database of both users
+        const codeOfConv = cod || Math.random().toString(36).substring(9); //Creation of code the new conversation
         who_be_update.forEach( async (Pin) => {
             const doc1 = await UsersDB.updateOne( { pin: Pin }, {
                 $push: { //Insert a new item in array conversations of user
