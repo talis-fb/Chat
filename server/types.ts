@@ -9,7 +9,7 @@ interface Mensagem {
 interface Conversation {
     cod: string,
     members: UserPin[],
-    messages: Array<Mensagem>
+    messages: Mensagem[]
 }
 
 interface User {

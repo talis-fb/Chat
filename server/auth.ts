@@ -6,7 +6,7 @@ async function generateAccessToken( user:UserRequest ){
     return jwt.sign(user, secret);
 }
 
-async function verify_jwt( token:string ){
+async function verify_jwt( token:string ) {
     return jwt.verify(token, secret)
 }
 

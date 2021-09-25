@@ -7,7 +7,7 @@ import Routes from './routes'
 
 // Database
 import db from './database'
-db.start()
+db.start() // Inicia a conexão com banco
 
 //jwt
 import * as jwt from './auth'
@@ -22,20 +22,6 @@ app.use(express.static(path.join( __dirname, '..','dist')))
 console.log(path.join( __dirname, '..','dist')) 
 app.set('views', path.join(__dirname,'..', 'dist'))
 
-// TESTE DA FUNÇÃO DE RETORNAR
-console.log("Ola mubndoooooooooooo")
-console.log(db.return_messages([ "m7g", "q13p", "3wh "]))
-
-async function aa(){
-    console.log("Ola mubndoooooooooooo")
-    console.log(await db.return_messages([ "m7g", "q13p", "3wh "]))
-}
-
-aa()
-//Configuration of Body-Parser
-// app.use(bodyParser.urlencoded({extended: false}))
-// app.use(bodyParser.json())
-
 // Pode importar só isso ao inves do body-parser
 app.use(express.urlencoded({extended: true}));
 app.use(express.json()) // To parse the incoming requests with JSON payloads
@@ -44,7 +30,7 @@ app.use(express.json()) // To parse the incoming requests with JSON payloads
 app.use(Routes)
 
 const save_name = async (socket:any, next:()=>void ) => {
-    // Era para socket a tipagem de 'Socket', mas n aceita adições
+    // Era para socket ter a tipagem de 'Socket', mas n aceita adições
 	const token = <any>socket.handshake.auth.token
 
 	let verify:any

@@ -7,7 +7,7 @@ interface IMessage extends Document {
 }
 const Message = new Schema<IMessage>({
 	from: { type: String, required: true },
-	body: { type: String, required: true },
+	body: String,
 })
 
 interface IMessageSchema extends Document {

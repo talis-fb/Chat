@@ -22,12 +22,13 @@ Router
 			console.log('- Processo de REGISTRO:')
 			// Extract dades of request
 			const { nickname, password } = req.body
-
-			const hashed_password =  await bcrypt.hash(password, saltRounds)
-
+            
 			// print dades
 			process.stdout.write(`\t [ok] Dados recebidos:` ) // Um console.log que não quebra linha
 			console.log(req.body)
+            
+            // const salt = await bcrypt.genSalt(saltRounds)
+			const hashed_password = await bcrypt.hash(password, saltRounds)
 
 			//If user already exist --> return error and finish function
 			const user_exist = !!(await db.search_user_with_name(nickname))
@@ -92,7 +93,7 @@ Router
 				return res.send({ error: 'senha errada' })
 			}
 
-			const token = generateAccessToken({ name: UserLogging.name, pin: UserLogging.pin })
+			const token:string = await generateAccessToken({ name: UserLogging.name, pin: UserLogging.pin })
 			console.log(`\t [ok] Token gerado`)
 
 			const dadesToSendBack = {
@@ -121,8 +122,8 @@ Router
 		let verify:any
 		let doc:User
 		try {
-			verify = verify_jwt(token)
-			console.log(`\t [ok] TOKEN validado` ) 
+			verify = await verify_jwt(token)
+			console.log(`\t [ok] TOKEN validado: ${verify}` ) 
 			doc = await db.search_user_with_name( verify.name ) //UsersDB.findOne({ name: verify.name }, 'conversations')
 		} catch(err){
 			console.log(`\t [x] ERRO RETORNO CONTATOS: `) 
@@ -130,39 +131,63 @@ Router
 			return res.send({ error: err })
 		}
 
-		const conversations:Array<string> = doc.conversations.map( ( i ):string => i.cod ) // return the array with all pins of conversations of user
-		let dades:Array<Mensagem> = []
+        console.log('encontrado')
+        console.log(doc)
+
+
+        if ( !doc.conversations.length )
+            return res.send([]) 
+
+		const conversations:Array<string> = doc.conversations.map( (i):string => i.cod ) // return the array with all pins of conversations of user
+        process.stdout.write(`\t CONTATOS RETORNADOS:`) 
+        console.log(conversations)
 
         const messages_found = await db.return_messages( conversations ) 
-
-		console.log(`\t [ok] TOKEN validado` ) 
-		console.log(`\t [ok] Dados enviados:` ) 
-		console.log(dades)
+        process.stdout.write(`\t [ok] DADOS ENVIADOS:`) 
+		console.log(messages_found)
 
 		return res.send( messages_found ) 
 	})
 
 	.post('/addContact', async (req:Request, res:Response) => {
+		// const { pin_to_get, pin_user_requesting } = req.body
+		const { pin, token  } = req.body
 
-		const { pin_to_get, pin_user_requesting } = req.body
+        let verify:any
+		try {
+			verify = await verify_jwt(token)
+			process.stdout.write(`\t [ok] TOKEN validado: ` ) 
+            console.log(verify)
+		} catch(err){
+			console.log(`\t [x] ERRO RETORNO CONTATOS: `) 
+			console.log(err)
+			return res.send({ error: err })
+		}
+
+        process.stdout.write(`\t Contao para adicionar:`)
+        console.log(pin)
 
 		//If the Pin received is the same of who is requesting
-		if( pin_to_get===pin_user_requesting ) {
+		if( pin===verify.pin ) {
 			return res.send({ error: 'PIN Invalido' })
 		}
 
-		const user_found:any = await db.search_user_with_pin( pin_to_get ) 
+		const user_found:any = await db.search_user_with_pin( pin ) 
 		if( !user_found ){
 			return res.send({ error: 'contato não encontrado' })
 		}
 
-		const isThereTalkBefore = user_found.conversations.filter( (i:any) => i.contact === pin_user_requesting )
+        process.stdout.write(`\t Contato Conversas:`)
+        console.log(user_found.conversations)
+
+        // Melhorar isoo <------------------------------------------------------------------------------------
+		const isThereTalkBefore = user_found.conversations.filter( (i:any) => i.contact === verify.pin )
 		if ( isThereTalkBefore[0] ){
 			return res.send({ error: 'já adicionado'})
 		}
 
 		// CRIAR O chat e ja adicioanar o contato 
-		const cod_conv = await db.new_message_db([ pin_user_requesting, pin_to_get ], "")
+		const cod_conv = await db.new_message_db([ pin, verify.pin ], "")
 
 		//SENDING BACK for the socket
 		const contact:any = {

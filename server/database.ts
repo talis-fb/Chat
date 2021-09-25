@@ -21,8 +21,9 @@ const check_db = {
 		return user_found
 	},
 	async return_messages(pin_of_chat:string[]){
-		const messages_found:any =  await MessagesDB.findOne({ cod: { $in: pin_of_chat }}, 'messages')
-		return messages_found.messages || []
+        const object_to_search = pin_of_chat.map( i => ({ cod: i }) )
+		const messages_found:any =  await MessagesDB.find({ $or: [ ...object_to_search ]})
+		return messages_found
 	}
 }
 
@@ -34,14 +35,20 @@ const manage_users_db = {
 		// Generate a new Pin random
 		const newPin = Math.random().toString(36).substring(9);
 
-		// Insert in database 
-		const newUser = new UsersDB(<User>{
-			pin: newPin,
-			name: name,
-			password: password,
-			conversations: []
-		})
-		const data = await newUser.save()
+        try {
+            // Insert in database 
+            const newUser = new UsersDB(<User>{
+                pin: newPin,
+                name: name,
+                password: password,
+                conversations: []
+            })
+            const data = await newUser.save()
+            console.log(`\t [ok] Novo usuario criado`)
+        } catch(err){
+            console.log(`\t [x] Erro ao criar novo usuario`)
+            console.log(err)
+        }
 
         return newPin // Retorna o pin do usuario
 	},
@@ -103,14 +110,20 @@ const manage_chat_db = {
 		//Creation of code the new conversation
 		const codeOfConv = cod || Math.random().toString(36).substring(9);
 
-		const message = new MessagesDB(<Conversation>{
-			members: [...members],
-			cod: codeOfConv,
-			messages: [{ from: members[0], body: first_message }]	
-		})
-		const res = await message.save()
-		return codeOfConv
-	}
+        try{
+            const message = new MessagesDB(<Conversation>{
+                members: members,
+                cod: codeOfConv,
+                messages: [{ from: members[0], body: first_message }]	
+            })
+            const res = await message.save()
+            console.log(`\t Nova conversa setada entre: ${members}`)
+        } catch(err){
+            console.log('Erro em salvar uma nova conversa:')
+            console.log(err)
+        }
+        return codeOfConv
+    }
 }
 
 export default {
