@@ -20,32 +20,14 @@ function WelcomeScreen(props){
         setAlert_error(null)
     }
 
-    function returnOption(){
+    function returnPasswordConfirm(){
         if(option){
             return (
                 <>
-                    <h2>Username</h2>
-                    <input type="text" name="nickname" onChange={handleInputChange}/>
-
-                    <h2>Senha</h2>
-                    <input type="password" name="password" onChange={handleInputChange}/>
-
                     <h2>Senha novamente...</h2>
                     <input type="password" name="passwordConfirm" onChange={handleInputChange}/>
-                    { !!alert_error ? <Alert className="alert_error" variant="danger">{alert_error}</Alert> : '' }
                 </>
-            )
-        } else {
-            return (
-                <>
-                    <h2>Username</h2>
-                    <input type="text" name="nickname" onChange={handleInputChange}/>
-
-                    <h2>Senha</h2>
-                    <input type="password" name="password" onChange={handleInputChange}/>
-                    { !!alert_error ? <Alert className="alert_error" variant="danger">{alert_error}</Alert> : '' }
-                </>
-            )
+            ) 
         }
     }
 
@@ -86,10 +68,10 @@ function WelcomeScreen(props){
                 const token = res.token
                 const user = JSON.stringify(res.user)
 
-                if ( token && user ) {
+                if ( token && res.user ) {
                     localStorage.setItem("token", token)
                     localStorage.setItem("user", user)
-                    window.location.reload()
+                    // window.location.reload()
                 }
 
             })
@@ -109,7 +91,16 @@ function WelcomeScreen(props){
                     <header className="mb-3">Chat-uTuVisse</header>
 
                     <form>
-                        {returnOption()}
+                        <h2>Username</h2>
+                        <input type="text" name="nickname" onChange={handleInputChange}/>
+
+                        <h2>Senha</h2>
+                        <input type="password" name="password" onChange={handleInputChange}/>
+
+                        {returnPasswordConfirm()}
+
+                        { !!alert_error ? <Alert className="alert_error" variant="danger">{alert_error}</Alert> : '' }
+
                         <Button className="button-confirm" onClick={(event) => requestFromServer(event)} variant="success">CHAT</Button>
                     </form>
 

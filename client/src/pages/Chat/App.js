@@ -13,7 +13,7 @@ import Auth from '../AuthService'
 import Profile from './Components/Profile'
 import ErrorLog from './Components/ErrorLog'
 
-import UserProvider, { Context } from './context/index'
+import UserProvider, { UserContext } from './context/UserContext'
 
 import './App.scss';
 
@@ -26,90 +26,9 @@ function App(props){
     const [ current_chat, set_current_chat ] = useState(0) // It's a number, of the index of conversation wanted. Start with the screen of Welcome
     const [ errors, setErrors] = useState([])
 
-    const { contacts, setNewContacts, setMessage } = useContext(Context);
-
-
-    useEffect( () => {
-        // Connect to socket of back-end sending your dades
-        const username =  dadesOfUser.name 
-        const pin = dadesOfUser.pin
-        const token = Auth.getToken()
-        socket.auth = { username, pin, token } // set attributes on propety 'auth', native of Socket.io
-        socket.connect() // Connect with the socket io
-
-        socket.onAny((event, ...args) => {
-            console.log('HERE')
-            console.log(contacts )
-            console.log(event, args);
-        });
-
-        const contatos_retornados = []
-
-        fetch( 'http://localhost:3000/returnContacts',  {
-            method: "POST", 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ token: Auth.getToken() })  
-        })
-            .then( res => res.json())
-            .then( res => {
-                console.log('Conversas q já tem')
-                console.log(res)
-                if ( res.error ) return show_an_error(res.error)
-                res.map( i => { 
-                    console.log('Ct Retornado'); 
-                    console.log(i)
-                    contatos_retornados.push(i)
-                })
-            })
-            .catch( err => show_an_error(err) )
-
-        // Set contatos_retornados
-        setNewContacts(contatos_retornados)
-
-        socket.on('newContact', contact => {
-            if ( contact.error ) return show_an_error(contact.error)
-            setNewContacts(contact)
-        })
-
-        socket.on('private message', (msg) => {
-            const {cod, body, from } = msg
-
-            
-
-            // BUUUUUUUUUUUUUUUUUUUUUUG <- 
-            console.log('RECEBIDOOOO')
-            console.log(msg)
-            console.log(contacts )
-
-
-             return
-            setMessage(cod, { body, from })
-
-            let state = [ ...contacts ]
-            console.log(state)
-            console.log(state == contacts)
-            return
-
-            for( let i in state ){
-                if( state[i].cod === cod){
-                    console.log("Achou")
-                    console.log(contacts[i])
-                    state[i].msgs.push({ from, body })
-                }
-            }
-        })
-
-        socket.on('new_chat', (chat) => {
-            setNewContacts(chat)
-        })
-
-    }, [])
-
-
-
+    const { contacts, setNewContacts, setMessage } = useContext(UserContext);
 
     // --------------------------------------
-
 
     useEffect(() =>{ 
         console.log('Atualiza cont')

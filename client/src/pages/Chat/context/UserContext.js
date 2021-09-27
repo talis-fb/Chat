@@ -15,7 +15,7 @@ const contactsDefault = [{
 ]
 
 // Context
-const Context = createContext();
+const UserContext = createContext();
 
 // Funcao que s retorna o Provider e armazena o state do contexto.
 function UserProvider({ children }) {
@@ -35,11 +35,11 @@ function UserProvider({ children }) {
     }
 
     return (
-        <Context.Provider value={{ contacts, setNewContacts, setMessage }}>
+        <UserContext.Provider value={{ contacts, setNewContacts, setMessage }}>
             {children}
-        </Context.Provider>
+        </UserContext.Provider>
     );
 }
 
-export { Context };
+export { UserContext };
 export default UserProvider;
